@@ -23,6 +23,13 @@ const HEAT: Record<ContributionLevel, string> = {
 const LEVELS = Object.keys(HEAT).map(Number) as ContributionLevel[]
 
 /** 並びに合わせて幅いっぱいまで広がるマス */
+/*
+ * 日付と本数を出す小さな札。1 行しか入らない（whitespace-nowrap）ので、
+ * 行送りは読みやすさではなく札の高さを決めているだけ。1.3 は 11px で 14px。
+ */
+const TOOLTIP =
+  'font-mono pointer-events-none absolute z-3 -translate-x-1/2 -translate-y-[calc(100%+8px)] rounded-md bg-fg px-2 py-1.25 text-meta leading-[1.3] whitespace-nowrap text-bg'
+
 const CELL = 'block aspect-square w-full rounded-xs'
 /** 凡例のマスだけは広げず 10px で固定する */
 const LEGEND_CELL = 'block size-2.5 flex-none rounded-xs'
@@ -102,7 +109,7 @@ export default function GitHubActivity() {
 
           {tip && (
             <p
-              className="font-mono pointer-events-none absolute z-3 -translate-x-1/2 -translate-y-[calc(100%+8px)] rounded-md bg-fg px-2 py-1.25 text-meta leading-[1.3] whitespace-nowrap text-bg"
+              className={TOOLTIP}
               style={{ left: tip.x, top: tip.y }}
               aria-hidden="true"
             >

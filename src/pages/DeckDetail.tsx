@@ -48,7 +48,7 @@ function Stage({
           alt={`Cover slide of ${deck.title}`}
           style={{ aspectRatio: String(deck.aspect) }}
         />
-        <span className="text-label leading-support text-muted">
+        <span className="text-label leading-prose text-muted">
           <strong className="mb-1.5 block text-lead text-fg group-hover:text-accent">
             Open all {deck.pageCount} pages at the source ↗
           </strong>
@@ -63,7 +63,7 @@ function Stage({
       <SlideViewer deck={deck} page={page} onPageChange={onPageChange} />
       {deck.video && (
         <section className="flex flex-col gap-3.5 pt-10">
-          <h2 className="font-mono text-note tracking-caps-wide text-faint">TALK VIDEO</h2>
+          <h2 className="font-mono text-note tracking-caps text-faint">TALK VIDEO</h2>
           <VideoEmbed video={deck.video} title={deck.title} />
         </section>
       )}
@@ -125,7 +125,7 @@ function Around({ deck, where, align }: { deck: Deck; where: string; align?: 'ri
     >
       <span className="font-mono text-meta tracking-caps text-faint">{where}</span>
       <span
-        className="text-body leading-normal font-semibold group-hover:text-accent"
+        className="text-body leading-prose font-semibold group-hover:text-accent"
         lang={textLang(deck.title)}
       >
         {deck.title}
@@ -162,7 +162,7 @@ export default function DeckDetail() {
       <div className="mt-8 grid grid-cols-[minmax(0,1fr)_240px] gap-10 border-t border-t-line py-10 max-wide:grid-cols-1 max-wide:gap-7">
         <div className="flex flex-col gap-3.5">
           <h1
-            className="text-display-sm leading-[1.4] font-bold text-pretty"
+            className="text-display-sm leading-title font-bold text-pretty"
             lang={textLang(deck.title)}
           >
             {deck.title}
@@ -176,7 +176,7 @@ export default function DeckDetail() {
           </p>
           {deck.description && (
             <p
-              className="max-w-[620px] text-lead leading-lead text-pretty text-muted"
+              className="max-w-[620px] text-lead leading-prose text-pretty text-muted"
               lang={textLang(deck.description)}
             >
               {deck.description}
@@ -187,7 +187,7 @@ export default function DeckDetail() {
 
           {deck.links.length > 0 && (
             <div className="mt-2.5 flex flex-col gap-2">
-              <p className="font-mono text-meta tracking-caps-wide text-faint">LINKS</p>
+              <p className="font-mono text-meta tracking-caps text-faint">LINKS</p>
               <ul className="flex flex-col gap-1.5 text-body">
                 {deck.links.map((link) => (
                   <li key={link.url}>

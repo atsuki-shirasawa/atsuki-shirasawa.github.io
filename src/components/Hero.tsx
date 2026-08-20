@@ -23,10 +23,10 @@ export default function Hero() {
             {profile.name}
           </h1>
           {/* 主張の 2 文。ここが読まれれば用は足りる */}
-          <p className="max-w-[620px] text-display-xs leading-[1.55] text-pretty text-fg max-narrow:text-display-2xs">
+          <p className="max-w-[620px] text-display-xs leading-lead text-pretty text-fg max-narrow:text-display-2xs">
             {profile.lead}
           </p>
-          <p className="max-w-[560px] text-body leading-support text-pretty text-muted">
+          <p className="max-w-[560px] text-body leading-prose text-pretty text-muted">
             {profile.support}
           </p>
         </div>

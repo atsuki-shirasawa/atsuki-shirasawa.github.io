@@ -66,7 +66,7 @@ export default function Writing() {
                 <SiteIcon site={post.site} size={13} />
               </span>
               <span
-                className="text-body leading-title text-pretty transition-colors group-hover:text-accent"
+                className="text-body leading-prose text-pretty transition-colors group-hover:text-accent"
                 lang={textLang(post.title)}
               >
                 {post.title}

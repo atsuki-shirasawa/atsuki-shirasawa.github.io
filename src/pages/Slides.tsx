@@ -34,7 +34,7 @@ export default function Slides() {
         <h1 className="display-title text-display-xl font-bold max-narrow:text-display-md">
           Slides
         </h1>
-        <p className="max-w-[680px] text-lead leading-lead text-pretty text-muted">
+        <p className="max-w-[680px] text-lead leading-prose text-pretty text-muted">
           Talks from meetups, conferences and internal lightning talks. Every deck opens in the
           browser — text stays selectable and links stay live — and search looks inside the slides,
           not just the titles.
