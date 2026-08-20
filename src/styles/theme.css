@@ -134,6 +134,24 @@
   --breakpoint-snug: 40rem; /* 640px — 横に並べた箱を縦へ積む */
   --breakpoint-tight: 35rem; /* 560px — カードの余白と数字の間を詰める */
   --breakpoint-tiny: 30rem; /* 480px — 入りきらない導線を畳む */
+
+  /*
+   * カードの上でスライドがめくれる。4 枚を 2.8s で回し、0.7s ずつずらして
+   * 重ねる（遅れは置いた側が animation-delay で持つ）。steps(1, end) は
+   * 中間を描かせないため — 紙は溶けずに入れ替わる。
+   */
+  --animate-page-turn: page-turn 2.8s steps(1, end) infinite;
+
+  @keyframes page-turn {
+    0%,
+    25% {
+      opacity: 1;
+    }
+    25.01%,
+    100% {
+      opacity: 0;
+    }
+  }
 }
 
 /*

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ExternalLink from './ExternalLink'
+import PlayBadge from './PlayBadge'
 import YouTubeThumb from './YouTubeThumb'
-import { PlayIcon } from './icons/UiIcons'
 import { watchUrl } from '../lib/video'
 import type { DeckVideo } from '../types'
 
@@ -47,13 +47,10 @@ export default function VideoEmbed({ video, title }: Props) {
         aria-label={`Play the talk video for ${title}`}
       >
         <YouTubeThumb id={video.id} className="block size-full object-cover" />
-        <span
-          className="absolute top-1/2 left-1/2 flex size-[68px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-glass shadow-float backdrop-blur-sm transition-[background,scale] duration-200 group-hover:scale-106 group-hover:bg-accent"
-          aria-hidden="true"
-        >
-          {/* 三角形の重心はやや左に寄るので、光学的に中央へ寄せる */}
-          <PlayIcon className="size-[30px] translate-x-0.5 fill-on-media" />
-        </span>
+        <PlayBadge
+          kind="embed"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        />
       </button>
       <ExternalLink className="self-end font-mono text-note" href={watchUrl(video)}>
         Watch on YouTube ↗

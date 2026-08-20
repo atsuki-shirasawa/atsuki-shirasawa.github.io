@@ -114,7 +114,7 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
 | --- | --- |
 | `src/styles/global.css` | パレット（`:root` / `html[data-theme='dark']`）、`@layer base` の要素既定、ページの骨格（`.app` `.wrap` `.main` `.section*`） |
 | `src/styles/theme.css` | `@theme` のトークンと `@utility` の意匠部品。**新しい値はまずここに名前を付ける** |
-| `*.module.css` | 4 本だけ残す（下記） |
+| `*.module.css` | 3 本だけ残す（下記） |
 
 ### 値を足すとき
 
@@ -127,6 +127,10 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
 - **見せる字は寸法で呼ぶ** — `display-2xs`(17) 〜 `display-3xl`(52)。
   20px は Hero のリード文と GitHub の数字、34px は Hero の名前と年間
   コントリビューションで共有されていて、用途名を付けるとどちらかが嘘になる
+- **行送りは字の大きさで決まる** — 読ませる字（16px 以下）は `leading-prose`(1.7)、
+  見せる字は 17〜20px が `leading-lead`(1.55)、28px 以上が `leading-title`(1.4)。
+  「字が大きくなるほど詰める」の 1 本しかないので、迷ったら大きさを見る
+- **総大文字の字送りは `tracking-caps`(0.1em) だけ**。段は作らない
 - 名前を付けるのは **2 箇所以上で同じ意味で使う値だけ**。1 箇所しかない光学的な
   微調整（ロゴの字送り、ツールチップの行送り）は arbitrary value でよい。
   ただし**なぜその値か**をコメントに残す
@@ -157,24 +161,24 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
 - Tailwind のスキャナはコメントや無関係な識別子からも候補を作る。`container`
   という語が `slideViewer.ts` にあるだけで `.container` の規則が 6 本出る（無害）
 
-### CSS Modules で残す 4 本
+### CSS Modules で残す 3 本
 
-utility に潰すと現状より読みにくくなるものだけ。
+**共有するものが無く、utility に潰すと現状より読みにくくなるもの**だけ。
+`@keyframes` は module に残る理由にならない（`--animate-*` として `@theme` に
+置ける。`page-turn` がそうなっている）。
 
 | ファイル | 残す理由 |
 | --- | --- |
 | `SlideViewer.module.css` | pdf.js が実行時に作る DOM（`:global(.textLayer)`）に className を渡せない |
-| `DeckCard.module.css` | `@keyframes page-turn` |
-| `CareerTrack.module.css` | `clip-path` の 0.9s リビール |
-| `Carousel.module.css` | `::-webkit-scrollbar` と scroll-snap |
+| `CareerTrack.module.css` | 経歴の線。10 要素すべてが 1 回きりの絶対配置で、独自の cubic-bezier と遅延を持つ。共有するものが無い |
+| `Carousel.module.css` | `::-webkit-scrollbar`。レールの 12 宣言も他に出てこない |
 
 ### 分かっている残り
 
-- 行送りが 1.65 / 1.7 / 1.8 / 1.85、総大文字の字送りが 0.08em / 0.12em と近い値で
-  並んでいる。意図というより経緯に見えるが、移行では変えずに名前だけ付けた
-- 再生ボタンの円が `VideoEmbed`（utility）と `DeckCard`（module）に 1 つずつある。
-  ガラスと影は共有の変数を引いているが、箱は別
-- CSS は導入前より増えている（gzip 7.1KB → 9.4KB）。この設計はほとんどの指定が
+- 再生のガラス円は `PlayBadge` に 1 つ。同じ絵を 3 つの大きさで使う
+  （記章 26 / カード 56 / 埋め込み 68）。的の 2 つは 56 と 68 で残してある —
+  載る面の幅が違う（カード 286px と版面いっぱい）ので、揃えるとどちらかが崩れる
+- CSS は導入前より増えている（gzip 7.1KB → 9.3KB）。この設計はほとんどの指定が
   1 箇所しか出てこないので、utility の「1 宣言 1 セレクタ」が module より高くつく。
   得ているのは可読性と保守性で、バイト数ではない
 
@@ -205,6 +209,7 @@ utility に潰すと現状より読みにくくなるものだけ。
 | 塗りのボタンを置く | `solid-accent`（地色と文字色が対で付く。`#fff` を書かない） |
 | ディスプレイ書体を張る | `display-title` / `display-metric` |
 | メディアに文字や記章を重ねる | `bg-glass` / `text-on-media`、または `var(--color-glass)` |
+| 再生のガラス円を置く | `<PlayBadge kind>`（`mark` 26 / `card` 56 / `embed` 68。的は囲みの `group` に反応する） |
 | 指の当たり判定を広げる | `tap` |
 | 読み上げにだけ渡す | `visually-hidden` |
 | ページ番号を丸める | `src/lib/page.ts` の `clampPage` / `parsePageParam` |
