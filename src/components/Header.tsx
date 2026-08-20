@@ -25,7 +25,7 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-10 border-b border-b-line bg-headerbg backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between gap-4">
+      <div className="wrap flex h-16 items-center justify-between gap-4">
         <NavLink
           to="/"
           className="tap flex shrink-0 items-center gap-2.5 text-strong font-bold tracking-[0.02em] text-fg hover:text-fg hover:no-underline"

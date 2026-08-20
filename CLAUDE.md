@@ -104,15 +104,91 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
   プロジェクトサイトへ移したとき（`BASE_PATH=/<repo>/`）に壊れる
 - ルーティングはハッシュ（`/#/slides/<slug>`）。Pages に SPA フォールバックが無いため
 
+## CSS の置き方
+
+Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル単位で分ける** —
+1 つのコンポーネントの中で両方は使わない。レイヤーの都合で勝ち負けの向きが逆に
+なるため（下記）。
+
+| ファイル | 持ちもの |
+| --- | --- |
+| `src/styles/global.css` | パレット（`:root` / `html[data-theme='dark']`）、`@layer base` の要素既定、ページの骨格（`.app` `.wrap` `.main` `.section*`） |
+| `src/styles/theme.css` | `@theme` のトークンと `@utility` の意匠部品。**新しい値はまずここに名前を付ける** |
+| `*.module.css` | 4 本だけ残す（下記） |
+
+### 値を足すとき
+
+`text-[13px]` のような生の値を書かない。`theme.css` に名前を付けてから使う。
+既定の語彙は `--color-* / --text-* / --breakpoint-*: initial` で捨ててあるので、
+`text-sm` や `gray-500` は存在しない（`text-body` と同義の名前を増やさないため）。
+
+- **読ませる字は用途で呼ぶ** — `micro`(10) `meta`(11) `note`(12) `label`(13)
+  `body`(14) `lead`(15) `strong`(16)。1px 刻みなので大きさでは選べない
+- **見せる字は寸法で呼ぶ** — `display-2xs`(17) 〜 `display-3xl`(52)。
+  20px は Hero のリード文と GitHub の数字、34px は Hero の名前と年間
+  コントリビューションで共有されていて、用途名を付けるとどちらかが嘘になる
+- 名前を付けるのは **2 箇所以上で同じ意味で使う値だけ**。1 箇所しかない光学的な
+  微調整（ロゴの字送り、ツールチップの行送り）は arbitrary value でよい。
+  ただし**なぜその値か**をコメントに残す
+- **テーマで変わる値だけ `@theme inline`** に置く。変わらない値（書体・ガラス・
+  寸法）は `@theme` 本体。inline に置くと `--font-sans: var(--font-sans)` の
+  自己参照になる。逆に、`@theme` 本体に置いた値は `:root` にも出るので
+  CSS Modules 側から `var(--color-glass)` で引ける
+- `global.css` 側と同じ名前にはできない。`--shadow-card` → `shadow-lift`、
+  `--glass` → `--color-glass` のように名前を変えて橋を渡す
+
+### 踏んだ罠
+
+- **`@layer base` から出すと utility が効かない。** レイヤー外の規則は utility
+  より常に強い。`a:hover { text-decoration: underline }` を素で書くと
+  `hover:no-underline` が負ける。逆に、ページの骨格クラスはレイヤーに入れない
+  （CSS Modules もレイヤー外なので、入れると module が必ず勝つようになる）
+- **同じ詳細度の utility は class 属性の並びで決まらない。** 共通文字列に
+  `text-muted` を置いて active 側で `text-fg` を足すのは効かない。勝つのは
+  生成 CSS の並び。**状態ごとに書き切る**
+- **`@utility` の名前は Tailwind の名前空間を避ける。** `fill-accent` と書くと
+  組み込みの `fill-*`（SVG の塗り）も同名で生成され、`fill:` が余分に付く。
+  `fill / stroke / bg / text / border / accent / ring / shadow / outline` は使わない
+- **入れ子の `color-mix()` は arbitrary value に書けない。** グラデーションの
+  停止位置として解釈され、`16%` が落ちてべた塗りになる。`@utility` に出す
+- **辺を指定する。** `border-t border-line` は 4 辺に色を置く。`border-t-line`
+- **折り返し点の境界を混ぜない。** `max-width: 720px` はちょうど 720px を含み、
+  `max-narrow`（`width < 45rem`）は含まない。CSS 側も `width < Nrem` で書く
+- Tailwind のスキャナはコメントや無関係な識別子からも候補を作る。`container`
+  という語が `slideViewer.ts` にあるだけで `.container` の規則が 6 本出る（無害）
+
+### CSS Modules で残す 4 本
+
+utility に潰すと現状より読みにくくなるものだけ。
+
+| ファイル | 残す理由 |
+| --- | --- |
+| `SlideViewer.module.css` | pdf.js が実行時に作る DOM（`:global(.textLayer)`）に className を渡せない |
+| `DeckCard.module.css` | `@keyframes page-turn` |
+| `CareerTrack.module.css` | `clip-path` の 0.9s リビール |
+| `Carousel.module.css` | `::-webkit-scrollbar` と scroll-snap |
+
+### 分かっている残り
+
+- 行送りが 1.65 / 1.7 / 1.8 / 1.85、総大文字の字送りが 0.08em / 0.12em と近い値で
+  並んでいる。意図というより経緯に見えるが、移行では変えずに名前だけ付けた
+- 再生ボタンの円が `VideoEmbed`（utility）と `DeckCard`（module）に 1 つずつある。
+  ガラスと影は共有の変数を引いているが、箱は別
+- CSS は導入前より増えている（gzip 7.1KB → 9.4KB）。この設計はほとんどの指定が
+  1 箇所しか出てこないので、utility の「1 宣言 1 セレクタ」が module より高くつく。
+  得ているのは可読性と保守性で、バイト数ではない
+
 ## コードの書き方
 
 既存に合わせる。
 
 - セミコロンなし、シングルクォート、2 スペース
-- CSS Modules（`Foo.tsx` に `Foo.module.css`）
 - コメントは日本語で **なぜそうしたか**を書く。何をしているかはコードが言う
 - `src/lib/` は React 非依存（`slideViewer.ts` は pdf.js を直接触る）。
   `src/hooks/` は振る舞い、`src/components/` は描画。集計や判定を `.tsx` に置かない
+- 状態から見た目を引くときは表にする（`GitHubActivity` の `HEAT`、`Writing` の
+  `siteColor`）。`[data-level='N']` を CSS に 5 本並べるより短く、`Record` に
+  すれば埋め忘れを型が言う
 
 置き場所が決まっているもの:
 
@@ -121,7 +197,16 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 | デッキの見せ方で分岐する | `src/lib/deckView.ts` の `DeckView`。`format === 'video'` を直に見ない |
 | デッキへのリンクを置く | `<DeckLink deck>`（外か中かを判断する） |
 | 外部リンクを置く | `<ExternalLink>`（`target` / `rel` を書かない） |
-| タグのチップを置く | `<DeckTags>`、または `global.css` の `.chip` |
+| タグのチップを置く | `<DeckTags>`、または `chip` |
+| 版面で囲む | `wrap`（`container` ではない — Tailwind の組み込みとぶつかる） |
+| 節を作る | `section` / `section-head` / `section-title` |
+| 左に固定幅・右に中身の行を作る | `section-row`（CAREER / TECH STACK / WRITING 共通） |
+| 罫線の箱をホバーで浮かせる | `lift` |
+| 塗りのボタンを置く | `solid-accent`（地色と文字色が対で付く。`#fff` を書かない） |
+| ディスプレイ書体を張る | `display-title` / `display-metric` |
+| メディアに文字や記章を重ねる | `bg-glass` / `text-on-media`、または `var(--color-glass)` |
+| 指の当たり判定を広げる | `tap` |
+| 読み上げにだけ渡す | `visually-hidden` |
 | ページ番号を丸める | `src/lib/page.ts` の `clampPage` / `parsePageParam` |
 | 現在年を読む | `src/lib/time.ts` の `currentYear`（`new Date()` を書かない） |
 | クエリを書き換える | `useQueryUpdate()`（常に `replace`） |

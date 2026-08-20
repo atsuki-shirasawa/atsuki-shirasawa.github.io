@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  --glass: rgba(20, 23, 26, 0.55);
-  --glass-strong: rgba(20, 23, 26, 0.82);
 }
 
 .stage {
@@ -159,9 +157,9 @@
   z-index: 5;
   padding: 8px 14px;
   border-radius: 8px;
-  background: var(--glass-strong);
-  backdrop-filter: blur(10px);
-  color: #fff;
+  background: var(--color-glass-strong);
+  backdrop-filter: blur(8px);
+  color: var(--color-on-media);
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.04em;
@@ -173,7 +171,7 @@
 }
 
 .noteFail a {
-  color: #fff;
+  color: var(--color-on-media);
   padding-left: 10px;
   text-decoration: underline;
 }
@@ -200,9 +198,9 @@
   height: 44px;
   border: 0;
   border-radius: 999px;
-  background: var(--glass);
-  backdrop-filter: blur(10px);
-  color: #fff;
+  background: var(--color-glass);
+  backdrop-filter: blur(8px);
+  color: var(--color-on-media);
   cursor: pointer;
   opacity: 0;
   transition:
@@ -235,7 +233,7 @@
 }
 
 .nav:hover:not(:disabled) {
-  background: var(--glass-strong);
+  background: var(--color-glass-strong);
   scale: 1.06;
 }
 
@@ -351,9 +349,9 @@
   inset: auto auto 5px 5px;
   padding: 3px 7px;
   border-radius: 999px;
-  background: var(--glass-strong);
-  backdrop-filter: blur(6px);
-  color: #fff;
+  background: var(--color-glass-strong);
+  backdrop-filter: blur(8px);
+  color: var(--color-on-media);
   font-size: 11px;
   line-height: 1;
 }
@@ -366,7 +364,7 @@
   box-shadow: none;
 }
 
-@media (max-width: 640px) {
+@media (width < 40rem) {
   .nav {
     opacity: 1;
   }

@@ -131,7 +131,11 @@ html[data-theme='dark'] {
   flex-direction: column;
 }
 
-.container {
+/*
+ * 版面。名前を container にすると Tailwind 組み込みの container utility と
+ * ぶつかり、折り返し点ごとに max-width を持つ規則が 5 本ぶん無駄に出る。
+ */
+.wrap {
   max-width: var(--content-width);
   margin: 0 auto;
   padding: 0 var(--content-pad);
@@ -182,83 +186,7 @@ html[data-theme='dark'] {
   font-size: 13px;
 }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-/* タグなどの丸いチップ。一覧の絞り込み・カード・詳細の 3 箇所で同じ物なのに、
-   module ごとに padding も hover もずれていたので、ここに寄せた。
-   ボタンにもリンクにも付くので、どちらでも同じに見えるところまで書く */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  /* 当たり判定を 24px 角（WCAG 2.5.8）に届かせる */
-  padding: 5px 12px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: var(--chipbg);
-  color: var(--chipfg);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
-}
-
-.chip:hover {
-  background: color-mix(in srgb, var(--accent), transparent 88%);
-  color: var(--accent);
-  text-decoration: none;
-}
-
-/* 押されたままになるのは絞り込みのタグだけ。ホバーとは枠線で見分ける */
-.chip[aria-pressed='true'] {
-  background: color-mix(in srgb, var(--accent), transparent 84%);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* 指で触る環境では、見た目はそのままに当たり判定だけ 44px 角へ広げる。
-   フレックスの子に付けることを前提にしている（絶対配置なので中身の並びは動かない） */
-@media (pointer: coarse) {
-  .tap {
-    position: relative;
-  }
-
-  .tap::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: max(100%, 44px);
-    height: max(100%, 44px);
-  }
-
-  /* チップは折り返す行に並ぶので当たり判定を重ねられない。実寸を広げる */
-  .chip {
-    padding: 9px 14px;
-  }
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-@media (max-width: 720px) {
+@media (width < 45rem) {
   :root {
     --content-pad: 20px;
   }

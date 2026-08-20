@@ -15,9 +15,8 @@ import type { Deck } from '../types'
 
 const FORMAT_LABEL = { marp: 'Markdown (Marp)', pdf: 'PDF', video: 'Video only' } as const
 
-/** 罫線で囲んだ箱。ホバーで枠を accent にして浮かせる */
-const LIFT =
-  'group rounded-xl border border-line bg-surface text-fg transition-[border-color,box-shadow] duration-200 hover:border-accent hover:shadow-lift hover:text-fg hover:no-underline'
+/** 浮く箱。枠と影の振る舞いは @utility lift が持つ */
+const LIFT = 'lift group rounded-xl bg-surface text-fg hover:text-fg hover:no-underline'
 
 /** 資料の入手先のボタン。塗りの色は solid-accent が地色と文字色を対で持つ */
 const DOWNLOAD =
@@ -153,7 +152,7 @@ export default function DeckDetail() {
   const goToPage = (next: number) => update({ p: next <= 1 ? '' : String(next) })
 
   return (
-    <div className="container">
+    <div className="wrap">
       <p className="font-mono pt-8 pb-5 text-label">
         <Link to="/slides">← Slides</Link>
       </p>

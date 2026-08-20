@@ -125,7 +125,7 @@
 }
 
 /* 幅が足りない画面では節目の年を畳み、両端だけ残す */
-@media (max-width: 720px) {
+@media (width < 45rem) {
   .year[data-inner] {
     display: none;
   }

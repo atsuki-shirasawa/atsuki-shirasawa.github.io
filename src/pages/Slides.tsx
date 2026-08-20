@@ -29,7 +29,7 @@ export default function Slides() {
   const showControls = decks.length >= CONTROLS_MIN_DECKS
 
   return (
-    <div className="container">
+    <div className="wrap">
       <section className="flex flex-col gap-4 pt-18 pb-10 max-narrow:pt-12 max-narrow:pb-8">
         <h1 className="display-title text-display-xl font-bold max-narrow:text-display-md">
           Slides

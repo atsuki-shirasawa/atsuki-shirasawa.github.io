@@ -95,7 +95,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (width < 35rem) {
   .nav {
     display: none;
   }

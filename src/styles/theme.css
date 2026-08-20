@@ -69,6 +69,22 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /*
+   * メディアに重ねる暗いガラスと、その上に置く文字。テーマでは切り替えない
+   * ——写真やスライドの上は、地色が何であれ暗いほうが読める。
+   *
+   * inline ではなく @theme 本体に置くので :root にも出る。utility からは
+   * bg-glass / fill-on-media、CSS Modules 側からは var(--color-glass) で
+   * 同じ 1 つの定義を引ける。alpha が 0.55 / 0.6 / 0.62 に散っていて、
+   * 意図なのか写し間違いなのか読めなかったのを 0.6 に揃えた。
+   */
+  --color-glass: rgb(20 23 26 / 0.6);
+  --color-glass-strong: rgb(20 23 26 / 0.82);
+  --color-on-media: #fff;
+
+  /* ガラスの丸いボタンを地から浮かせる影 */
+  --shadow-float: 0 4px 20px rgb(0 0 0 / 0.35);
+
+  /*
    * 読ませる字。10〜16px を 1px 刻みで使っていて、間隔が狭いぶん「どれを使うか」
    * は大きさでは決まらない。だから用途で呼ぶ。11 と 12 を「xs と sm」と呼ぶと
    * 選べないが、「meta と note」なら選べる。
@@ -201,6 +217,106 @@
     background: var(--accent2);
     color: var(--accent-fg);
     text-decoration: none;
+  }
+}
+
+/*
+ * カードの地。罫線と丸めだけを持ち、余白は使う側が決める。
+ */
+@utility card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+/*
+ * タグなどの丸いチップ。一覧の絞り込み・カード・詳細の 3 箇所で同じ物なのに
+ * module ごとに padding も hover もずれていた。ボタンにもリンクにも付くので、
+ * どちらでも同じに見えるところまで書く。
+ */
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* 当たり判定を 24px 角（WCAG 2.5.8）に届かせる */
+  padding: 5px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--chipbg);
+  color: var(--chipfg);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent), transparent 88%);
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* 押されたままになるのは絞り込みのタグだけ。ホバーとは枠線で見分ける */
+  &[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--accent), transparent 84%);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 折り返す行に並ぶので当たり判定を重ねられない。指で触る環境では実寸を広げる */
+  @media (pointer: coarse) {
+    padding: 9px 14px;
+  }
+}
+
+/*
+ * 指で触る環境で、見た目はそのままに当たり判定だけ 44px 角へ広げる。
+ * フレックスの子に付けることを前提にしている（絶対配置なので中身の並びは動かない）。
+ */
+@utility tap {
+  @media (pointer: coarse) {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+    }
+  }
+}
+
+/** 読み上げにだけ渡す文字 */
+@utility visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * 罫線で囲んだ箱。ホバーで枠を accent にして浮かせる。一覧のカード、借りものの
+ * 表紙、前後送り、動画のサムネイルが同じ振る舞いで、4 箇所に写されていた。
+ */
+@utility lift {
+  border: 1px solid var(--line);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-card);
   }
 }
 
