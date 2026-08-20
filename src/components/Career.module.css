@@ -1,0 +1,81 @@
+.row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line2);
+}
+
+/* 次の節の上罫線とすぐ並ぶので、最後の行では引かない */
+.row:last-child {
+  border-bottom: 0;
+}
+
+/* 在籍の長さがこの節でいちばん効く情報なので、最薄の扱いをやめる */
+.period {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+
+.years {
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* 社名は伏せた表記。役職より一段落として添える */
+.org {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--faint);
+}
+
+.org::before {
+  content: '/';
+  padding-right: 10px;
+  color: var(--line);
+}
+
+.desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .period {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    padding-top: 0;
+  }
+
+  /* 折り返して行頭に来たスラッシュは迷子に見えるので落とす */
+  .org::before {
+    content: none;
+  }
+}

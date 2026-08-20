@@ -1,0 +1,387 @@
+.viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  --glass: rgba(20, 23, 26, 0.55);
+  --glass-strong: rgba(20, 23, 26, 0.82);
+}
+
+.stage {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px -28px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+/* 描いたページ。寸法は script が決め、margin:auto でステージの中央に置く */
+.page {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 1 ページ目の静止画。pdf.js が描くまでの絵で、描けなかったときはこれが残る */
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 3;
+}
+
+/*
+ * pdf.js が描き終えた瞬間に消す。フェードはしない。差し替わるのは同じ位置の
+ * 同じページで隠すものが無いうえ、終わり損ねた transition は静止画を上に
+ * 残したままにしてしまう。
+ */
+.viewer[data-state='ready'] .poster {
+  display: none;
+}
+
+/* --- pdf.js が埋めるレイヤー ---------------------------
+ * pdfjs-dist/web/pdf_viewer.css から、テキストのあるページに要る分だけ写した。
+ * span は実行時に作られるのでスコープできない（だから :global）。位置はページに
+ * 対するパーセントで来るため、リサイズしてもレイヤーを作り直さなくてよい。
+ */
+.viewer :global(.textLayer) {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  caret-color: CanvasText;
+  forced-color-adjust: none;
+  line-height: 1;
+  overflow: clip;
+  text-align: initial;
+  text-size-adjust: none;
+  transform-origin: 0 0;
+  --min-font-size: 1;
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --scale-round-x: 1px;
+  --scale-round-y: 1px;
+}
+
+.viewer :global(.textLayer :is(span, br)) {
+  position: absolute;
+  color: transparent;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+  white-space: pre;
+}
+
+.viewer :global(.textLayer > :not(.markedContent)),
+.viewer :global(.textLayer .markedContent span:not(.markedContent)) {
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+  z-index: 1;
+  --font-height: 0;
+  --rotate: 0deg;
+  --scale-x: 1;
+}
+
+.viewer :global(.textLayer .markedContent) {
+  display: contents;
+}
+
+.viewer :global(.textLayer span[role='img']) {
+  cursor: default;
+  user-select: none;
+}
+
+.viewer :global(.textLayer ::selection) {
+  background: color-mix(in srgb, var(--accent), transparent 65%);
+  color: transparent;
+}
+
+/* 文字の下に伸びる見えない尻尾。最終行より下へドラッグしても選択が続く */
+.viewer :global(.textLayer .endOfContent) {
+  position: absolute;
+  inset: 100% 0 0;
+  display: block;
+  cursor: default;
+  user-select: none;
+  z-index: 0;
+}
+
+.viewer :global(.textLayer.selecting .endOfContent) {
+  top: 0;
+}
+
+/* PDF が持つリンクを組み直したもの。層そのものが選択を奪わないようにする */
+.links {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.links :global(:is(a, button)) {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.links :global(:is(a, button):hover),
+.links :global(:is(a, button):focus-visible) {
+  background: color-mix(in srgb, var(--accent), transparent 78%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent), transparent 45%);
+}
+
+/* --- 読み込みと失敗 --- */
+
+.note {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 5;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--glass-strong);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  animation: note-in 0.25s ease 0.6s both;
+}
+
+.noteFail {
+  animation: none;
+}
+
+.noteFail a {
+  color: #fff;
+  padding-left: 10px;
+  text-decoration: underline;
+}
+
+@keyframes note-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* フレームに重ねるページ送り。どんなスライドの上でも読めるようガラスにする */
+.nav {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.25s,
+    background-color 0.25s,
+    scale 0.25s;
+}
+
+.nav svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.nav[data-nav='prev'] {
+  left: 14px;
+}
+
+.nav[data-nav='next'] {
+  right: 14px;
+}
+
+.stage:hover .nav,
+.nav:focus-visible {
+  opacity: 1;
+}
+
+.nav:hover:not(:disabled) {
+  background: var(--glass-strong);
+  scale: 1.06;
+}
+
+.nav:disabled {
+  cursor: default;
+  opacity: 0;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+/* 何度も目をやる数字なのでチップにする */
+.counter {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--chipbg);
+  color: var(--chipfg);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.hint {
+  margin-right: auto;
+  color: var(--faint);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.fullscreen {
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.fullscreen:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/*
+ * フィルムストリップ。スナップし、末尾側だけをぼかしてスクロールできることを示す。
+ * 先頭までぼかすと、まだ動かしていないのに 1 ページ目が暗く見えてしまう。
+ */
+.strip {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0 12px;
+  list-style: none;
+  overflow-x: auto;
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.stripItem {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+}
+
+.stripButton {
+  position: relative;
+  display: block;
+  width: 116px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s,
+    opacity 0.2s,
+    translate 0.2s;
+}
+
+.stripButton img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stripButton[aria-current='false'] {
+  opacity: 0.5;
+}
+
+.stripButton:hover {
+  opacity: 1;
+  translate: 0 -2px;
+}
+
+.stripButton[aria-current='true'] {
+  box-shadow: 0 0 0 2px var(--accent);
+  opacity: 1;
+}
+
+.stripNum {
+  position: absolute;
+  inset: auto auto 5px 5px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--glass-strong);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* 全画面では黒地にスライドを収める */
+.stage:fullscreen {
+  background: #000;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .nav {
+    opacity: 1;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  .stripButton {
+    width: 88px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note {
+    animation-duration: 0.01s;
+  }
+}

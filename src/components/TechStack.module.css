@@ -1,0 +1,49 @@
+.legend {
+  margin: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 24px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line2);
+}
+
+/* 次の節の上罫線とすぐ並ぶので、最後の行では引かない */
+.row:last-child {
+  border-bottom: 0;
+}
+
+.category {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+/* 1 語ずつを折り返しの単位にする。地の文として並べると、
+   中黒の前後に改行の機会がなく行が縮まなくなる */
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 0;
+  row-gap: 4px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.item:not(:last-child)::after {
+  content: '·';
+  padding: 0 6px;
+  color: var(--line);
+}
+
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 12px 0;
+  }
+}

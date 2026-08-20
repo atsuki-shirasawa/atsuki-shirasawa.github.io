@@ -1,0 +1,242 @@
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --fg: #1a1d21;
+  --muted: #5b6168;
+  /* 日付・期間・ラベルに広く使う。--bg で 4.67:1 / --surface で 4.88:1（WCAG AA） */
+  --faint: #6b7278;
+  --line: #e6e6e2;
+  --line2: #eeeeea;
+  --chipbg: #f1f1ec;
+  --chipfg: #3a4046;
+  --hoverbg: #f4f4f0;
+  --accent: #0f6e5c;
+  --accent2: #0a4f42;
+  /* アクセント地の上に置く文字。#0f6e5c で 6.17:1 */
+  --accent-fg: #ffffff;
+  --headerbg: rgba(250, 250, 248, 0.9);
+  --shadow-card: 0 4px 16px rgba(15, 110, 92, 0.12);
+  --selection-bg: #c8ece4;
+  --selection-fg: #1a1d21;
+
+  /* 各ブログのブランドカラー（Zenn #3EA8FF / Qiita #55C500） */
+  --zenn: #3ea8ff;
+  --zenn-fg: #0f6ebd;
+  --qiita: #55c500;
+  --qiita-fg: #3f8b00;
+
+  /* GitHub コントリビューションの強度 0〜4 */
+  --heat-0: #f1f1ec;
+  --heat-1: #c8e6dc;
+  --heat-2: #7fc7ab;
+  --heat-3: #3ba07f;
+  --heat-4: #0f6e5c;
+
+  /* 名前・Slides の見出し・年間コントリビューションの 3 箇所だけに使う */
+  --font-display: 'Archivo', 'IBM Plex Sans JP', system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP',
+    sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --content-width: 960px;
+  --content-pad: 32px;
+}
+
+html[data-theme='dark'] {
+  --bg: #121416;
+  --surface: #1b1e21;
+  --fg: #eceeee;
+  --muted: #a6adb3;
+  /* --bg で 5.49:1 / --surface で 4.98:1（WCAG AA） */
+  --faint: #868d93;
+  --line: #2a2e32;
+  --line2: #24282c;
+  --chipbg: #24282c;
+  --chipfg: #c4cacf;
+  --hoverbg: #1f2327;
+  --accent: #3ec9a7;
+  --accent2: #66d9bd;
+  /* #3ec9a7 で 8.90:1 */
+  --accent-fg: #121416;
+  --headerbg: rgba(18, 20, 22, 0.9);
+  --shadow-card: 0 4px 16px rgba(62, 201, 167, 0.14);
+  --selection-bg: #215a49;
+  --selection-fg: #eceeee;
+
+  --zenn-fg: #7cc4ff;
+  --qiita-fg: #93d95c;
+
+  --heat-0: #24282c;
+  --heat-1: #1f4a3e;
+  --heat-2: #1f6e56;
+  --heat-3: #2ba57c;
+  --heat-4: #3ec9a7;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent2);
+  text-decoration: underline;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+/* --- 共通レイアウト --- */
+
+.app {
+  min-height: 100vh;
+  background: var(--bg);
+  transition: background 0.25s;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 var(--content-pad);
+  width: 100%;
+}
+
+.main {
+  flex: 1;
+  padding-bottom: 96px;
+}
+
+.section {
+  padding: 48px 0;
+  border-top: 1px solid var(--line);
+}
+
+.section:last-child {
+  padding-bottom: 0;
+}
+
+/* 直前の節と地続きに読ませたい節。Hero の経歴ラインから続く CAREER がこれ */
+.section-joined {
+  border-top: 0;
+  padding-top: 8px;
+}
+
+/* すべてのセクションの見出し。左に題、右に節そのものへのリンク（無い節もある） */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  font-size: 14px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+
+.section-links {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* 指で触る環境では、見た目はそのままに当たり判定だけ 44px 角へ広げる。
+   フレックスの子に付けることを前提にしている（絶対配置なので中身の並びは動かない） */
+@media (pointer: coarse) {
+  .tap {
+    position: relative;
+  }
+
+  .tap::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --content-pad: 20px;
+  }
+
+  .section {
+    padding: 36px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

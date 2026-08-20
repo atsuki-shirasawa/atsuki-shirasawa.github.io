@@ -1,0 +1,13 @@
+node_modules
+dist
+.DS_Store
+*.local
+*.tsbuildinfo
+
+# scripts/build-decks.mjs が decks/ から生成する中間物
+/public/decks/
+/public/pdfjs/
+/public/decks-search.json
+/src/data/decks.json
+/.cache/
+decks/**/.marp-build.md

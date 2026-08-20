@@ -1,0 +1,10 @@
+.all {
+  font-size: 13px;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.all:hover {
+  color: var(--accent);
+  text-decoration: none;
+}

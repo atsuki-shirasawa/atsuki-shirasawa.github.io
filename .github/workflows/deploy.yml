@@ -1,0 +1,68 @@
+name: Deploy portfolio to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # 記事・スライド・コントリビューションを毎朝取り直して公開する（JST 6:00）
+  schedule:
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Marp のデッキは Chrome で PDF 化する。変わっていないデッキは
+      # scripts/build-decks.mjs のフィンガープリントで再生成を飛ばせるので、
+      # その成果物とキャッシュを持ち越す。
+      - name: Restore built decks
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache
+            public/decks
+            public/pdfjs
+          key: decks-${{ hashFiles('decks/**', 'scripts/build-decks.mjs') }}
+          restore-keys: decks-
+
+      - name: Fetch content and build
+        env:
+          # contributions は GraphQL のため認証が必要。GH_PAT (public_repo / read:user)
+          # が設定されていればそれを使い、無ければ GITHUB_TOKEN で試す。
+          # 取得に失敗してもコミット済みの src/data/generated.json でビルドは通る。
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          # ユーザーサイト (<user>.github.io) なのでルート配信
+          BASE_PATH: /
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

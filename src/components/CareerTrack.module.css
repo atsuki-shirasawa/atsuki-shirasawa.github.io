@@ -1,0 +1,132 @@
+.eras {
+  position: relative;
+  height: 15px;
+  margin-bottom: 10px;
+}
+
+.era {
+  position: absolute;
+  top: 0;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.4s 0.5s;
+}
+
+.eraNow {
+  padding-left: 10px;
+  color: var(--accent);
+}
+
+.track[data-drawn] .era {
+  opacity: 1;
+}
+
+.rail {
+  position: relative;
+  height: 2px;
+}
+
+/* 掃くように開く。切り取りの箱は線そのものなので、点や目盛りは入れない */
+.line {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.track[data-drawn] .line {
+  clip-path: inset(0 0 0 0);
+}
+
+/* 地図をつくっていた年月。測量済みの車線の破線 */
+.lane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  border-top: 2px dashed color-mix(in srgb, var(--fg) 32%, transparent);
+}
+
+/* 今の区間だけ実線 */
+.road {
+  position: absolute;
+  top: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.marks {
+  position: absolute;
+  inset: 0;
+}
+
+/* 節目の年。線から下へ短く伸ばす */
+.tick {
+  position: absolute;
+  top: 2px;
+  width: 1px;
+  height: 8px;
+  background: var(--faint);
+  opacity: 0;
+  transition: opacity 0.3s 0.6s;
+}
+
+.track[data-drawn] .tick {
+  opacity: 1;
+}
+
+/* 現在地 */
+.now {
+  position: absolute;
+  top: 1px;
+  left: 100%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--bg);
+  translate: -50% -50%;
+  scale: 0;
+  transition: scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s;
+}
+
+.track[data-drawn] .now {
+  scale: 1;
+}
+
+.years {
+  position: relative;
+  height: 15px;
+  margin-top: 14px;
+}
+
+.year {
+  position: absolute;
+  top: 0;
+  font-size: 11px;
+  color: var(--faint);
+  translate: -50% 0;
+  white-space: nowrap;
+}
+
+/* 端のラベルはトラックの外へはみ出させない */
+.year[data-first] {
+  translate: 0 0;
+}
+
+.year[data-end] {
+  translate: -100% 0;
+  color: var(--muted);
+}
+
+/* 幅が足りない画面では節目の年を畳み、両端だけ残す */
+@media (max-width: 720px) {
+  .year[data-inner] {
+    display: none;
+  }
+}
