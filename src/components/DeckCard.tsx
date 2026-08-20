@@ -57,7 +57,7 @@ export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
           )}
 
           {view.kind !== 'video' && (
-            <p className={`mono ${styles.count}`}>
+            <p className={`font-mono ${styles.count}`}>
               {deck.pageCount}
               <span className={styles.countUnit}>p</span>
             </p>
@@ -68,7 +68,7 @@ export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
         </h3>
       </DeckLink>
 
-      <p className={`mono ${styles.meta}`}>
+      <p className={`font-mono ${styles.meta}`}>
         <span>{formatDeckDate(deck.date)}</span>
         {deck.event && <span className={styles.event}>{deck.event}</span>}
         {/* 外へ出るカードは、どこへ行くのかを先に見せる */}

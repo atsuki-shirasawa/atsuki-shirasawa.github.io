@@ -60,7 +60,7 @@ export default function GitHubActivity() {
             <div className="flex w-full min-w-min flex-col gap-1.5">
               {/* ラベルは列より広いので、そのまま右の列へはみ出させる */}
               <div
-                className="mono grid w-full auto-cols-[minmax(10px,1fr)] grid-flow-col gap-0.75"
+                className="font-mono grid w-full auto-cols-[minmax(10px,1fr)] grid-flow-col gap-0.75"
                 aria-hidden="true"
               >
                 {months.map((month, index) => (
@@ -102,7 +102,7 @@ export default function GitHubActivity() {
 
           {tip && (
             <p
-              className="mono pointer-events-none absolute z-3 -translate-x-1/2 -translate-y-[calc(100%+8px)] rounded-md bg-fg px-2 py-1.25 text-meta leading-[1.3] whitespace-nowrap text-bg"
+              className="font-mono pointer-events-none absolute z-3 -translate-x-1/2 -translate-y-[calc(100%+8px)] rounded-md bg-fg px-2 py-1.25 text-meta leading-[1.3] whitespace-nowrap text-bg"
               style={{ left: tip.x, top: tip.y }}
               aria-hidden="true"
             >
@@ -124,8 +124,8 @@ export default function GitHubActivity() {
                 <span
                   className={
                     stat.lead
-                      ? 'display-metric text-metric-lead font-semibold text-fg'
-                      : 'mono text-metric font-semibold text-fg'
+                      ? 'display-metric text-display-lg font-semibold text-fg'
+                      : 'font-mono text-display-xs font-semibold text-fg'
                   }
                 >
                   {formatCount(stat.value)}

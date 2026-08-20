@@ -43,6 +43,12 @@
   --color-qiita-fg: var(--qiita-fg);
   --color-headerbg: var(--headerbg);
 
+  /*
+   * 浮くカードの影。global.css 側の名前は --shadow-card だが、こちらで同名に
+   * すると --shadow-card: var(--shadow-card) の自己参照になるので名前を変える。
+   */
+  --shadow-lift: var(--shadow-card);
+
   /* コントリビューションの濃さ 0〜4。強度は JS が持っているので bg-heat-N で引く */
   --color-heat-0: var(--heat-0);
   --color-heat-1: var(--heat-1);
@@ -63,8 +69,9 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /*
-   * 文字の大きさ。名前は用途で付ける。11 と 12 の差を「xs と sm」と呼ぶと
-   * どちらを使うか決まらないが、「meta と note」なら決まる。
+   * 読ませる字。10〜16px を 1px 刻みで使っていて、間隔が狭いぶん「どれを使うか」
+   * は大きさでは決まらない。だから用途で呼ぶ。11 と 12 を「xs と sm」と呼ぶと
+   * 選べないが、「meta と note」なら選べる。
    */
   --text-micro: 10px; /* ヒートマップの月ラベルだけ。読ませるためではなく位置を示す字 */
   --text-meta: 11px; /* 年数・ページ番号など、本文に添える最小の値 */
@@ -74,24 +81,45 @@
   --text-lead: 15px; /* 本文より一段強い行。役職名やリード文 */
   --text-strong: 16px; /* サイト名 */
 
-  /* 数字を計器として読ませる大きさ。並ぶ数字と、その中の主役 1 つ */
-  --text-metric: 20px;
-  --text-metric-lead: 34px;
+  /*
+   * 見せる字。こちらは間隔が広く、選ぶ基準が素直に「どれくらい大きいか」なので
+   * 寸法で呼ぶ。用途で呼ぶと破れる — 20px は Hero のリード文と GitHub の数字、
+   * 34px は Hero の名前（狭い幅）と年間コントリビューションで共有されていて、
+   * どちらの用途名を付けても片方が嘘になる。
+   */
+  --text-display-2xs: 17px;
+  --text-display-xs: 20px;
+  --text-display-sm: 28px;
+  --text-display-md: 30px;
+  --text-display-lg: 34px;
+  --text-display-xl: 40px;
+  --text-display-2xl: 44px;
+  --text-display-3xl: 52px;
 
-  /* ページの見出し */
-  --text-page-title: 40px;
-  --text-page-title-sm: 30px;
-
-  /* 行送り。本文系だけ名前を持たせる */
+  /*
+   * 行送り。1.65 / 1.7 / 1.8 / 1.85 と近い値が 4 つあり、これは意図というより
+   * 経緯に見える。移行では変えずに名前だけ付けた。1 つに畳んでよいかは別の判断。
+   */
   --leading-title: 1.65; /* 折り返す見出し */
   --leading-prose: 1.7; /* 続けて読ませる文 */
+  --leading-support: 1.8; /* 主張に添える補足 */
   --leading-lead: 1.85; /* 節や記事の導入。行間を空けて読み出しを軽くする */
 
   /*
-   * 折り返し点。段組みを 1 列へ落とすところが 1 つあるだけで、
-   * Tailwind の sm/md/lg（640/768/1024）とはどれも一致しない。
+   * 総大文字の小見出しに入れる字送り。こちらも 2 段あるのは経緯で、
+   * 揃えてよいかは別の判断。
    */
+  --tracking-caps: 0.08em;
+  --tracking-caps-wide: 0.12em;
+
+  /*
+   * 折り返し点。広いほうから wide > narrow > snug > tight > tiny の順で、
+   * Tailwind の sm/md/lg（640/768/1024）とはどれも一致しないので既定は捨てた。
+   * 名前の順序が英語として自明ではないので、px を併記してある。
+   */
+  --breakpoint-wide: 53.75rem; /* 860px — 2 カラムのままだが窮屈になる */
   --breakpoint-narrow: 45rem; /* 720px — 段組みを 1 列へ落とす */
+  --breakpoint-snug: 40rem; /* 640px — 横に並べた箱を縦へ積む */
   --breakpoint-tight: 35rem; /* 560px — カードの余白と数字の間を詰める */
   --breakpoint-tiny: 30rem; /* 480px — 入りきらない導線を畳む */
 }
@@ -123,6 +151,57 @@
   font-variation-settings: 'wdth' 112;
   line-height: 1.05;
   letter-spacing: -0.01em;
+}
+
+/*
+ * アクセント色のごく淡いにじみで、写真を背景から浮かせる。
+ *
+ * arbitrary value では書けない。before:bg-[radial-gradient(...)] と書くと
+ * 入れ子の color-mix() がグラデーションの停止位置として解釈され、16% が
+ * 落ちて var(--accent) のべた塗りになる（実際に一度そうなった）。
+ */
+@utility glow-accent {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+/*
+ * 塗りのボタン。ページでいちばん強い導線ひとつにだけ使う。
+ *
+ * 名前は Tailwind の名前空間を避ける。fill-accent と書くと組み込みの fill-*
+ * （SVG の塗り）も同名で生成され、fill: var(--accent) が余分に付いた。
+ *
+ * 地色と文字色を必ず一緒に運ばせるのがこの utility の目的。Hero の主ボタンと
+ * DeckDetail の Download PDF は同じ見た目だが、後者は写されたときに
+ * --accent-fg を落として #fff になり、ダークで 2.09:1 のまま公開されていた。
+ * 箱（余白・罫線）は場所ごとに違うので持たせない。
+ */
+@utility solid-accent {
+  background: var(--accent);
+  color: var(--accent-fg);
+
+  &:hover {
+    background: var(--accent2);
+    color: var(--accent-fg);
+    text-decoration: none;
+  }
 }
 
 /*

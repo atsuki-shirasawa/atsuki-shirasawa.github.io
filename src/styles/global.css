@@ -188,10 +188,6 @@ html[data-theme='dark'] {
   border-radius: 12px;
 }
 
-.mono {
-  font-family: var(--font-mono);
-}
-
 /* タグなどの丸いチップ。一覧の絞り込み・カード・詳細の 3 箇所で同じ物なのに、
    module ごとに padding も hover もずれていたので、ここに寄せた。
    ボタンにもリンクにも付くので、どちらでも同じに見えるところまで書く */

@@ -154,10 +154,10 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
       </div>
 
       <div className={styles.bar}>
-        <p className={`mono ${styles.counter}`} aria-live="polite">
+        <p className={`font-mono ${styles.counter}`} aria-live="polite">
           {page} / {total}
         </p>
-        <p className={`mono ${styles.hint}`}>← → to turn pages / F for fullscreen</p>
+        <p className={`font-mono ${styles.hint}`}>← → to turn pages / F for fullscreen</p>
         <button className={styles.fullscreen} type="button" onClick={toggleFullscreen}>
           Fullscreen
         </button>
@@ -174,7 +174,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
               onClick={() => go(number)}
             >
               <img src={thumbImage(deck.slug, number)} alt="" loading="lazy" decoding="async" />
-              <span className={`mono ${styles.stripNum}`}>{number}</span>
+              <span className={`font-mono ${styles.stripNum}`}>{number}</span>
             </button>
           </li>
         ))}

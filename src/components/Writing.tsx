@@ -51,7 +51,7 @@ export default function Writing() {
       <ul>
         {ordered.map((post) => (
           <li className="section-row py-3 max-narrow:gap-1" key={post.url}>
-            <span className="mono pt-0.75 text-note tabular-nums text-faint max-narrow:pt-0">
+            <span className="font-mono pt-0.75 text-note tabular-nums text-faint max-narrow:pt-0">
               {post.date}
             </span>
             <ExternalLink

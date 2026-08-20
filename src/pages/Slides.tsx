@@ -31,7 +31,7 @@ export default function Slides() {
   return (
     <div className="container">
       <section className="flex flex-col gap-4 pt-18 pb-10 max-narrow:pt-12 max-narrow:pb-8">
-        <h1 className="display-title text-page-title font-bold max-narrow:text-page-title-sm">
+        <h1 className="display-title text-display-xl font-bold max-narrow:text-display-md">
           Slides
         </h1>
         <p className="max-w-[680px] text-lead leading-lead text-pretty text-muted">
@@ -76,7 +76,7 @@ export default function Slides() {
         )}
 
         {filtered && (
-          <p className="mono flex items-center gap-3 text-note text-faint" aria-live="polite">
+          <p className="font-mono flex items-center gap-3 text-note text-faint" aria-live="polite">
             {results.length} {results.length === 1 ? 'result' : 'results'}
             {activeTag && ` / tag: ${activeTag}`}
             <button

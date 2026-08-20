@@ -12,9 +12,16 @@ import { textLang } from '../lib/lang'
 import { parsePageParam } from '../lib/page'
 import { pdfPath, thumbImage } from '../lib/paths'
 import type { Deck } from '../types'
-import styles from './DeckDetail.module.css'
 
 const FORMAT_LABEL = { marp: 'Markdown (Marp)', pdf: 'PDF', video: 'Video only' } as const
+
+/** 罫線で囲んだ箱。ホバーで枠を accent にして浮かせる */
+const LIFT =
+  'group rounded-xl border border-line bg-surface text-fg transition-[border-color,box-shadow] duration-200 hover:border-accent hover:shadow-lift hover:text-fg hover:no-underline'
+
+/** 資料の入手先のボタン。塗りの色は solid-accent が地色と文字色を対で持つ */
+const DOWNLOAD =
+  'solid-accent inline-flex items-center justify-center rounded-lg px-4.5 py-3 text-center text-body font-semibold'
 
 type Part = { deck: Deck; view: DeckView }
 
@@ -32,15 +39,18 @@ function Stage({
 
   if (view.kind === 'away') {
     return (
-      <ExternalLink className={styles.away} href={view.url}>
+      <ExternalLink
+        className={`${LIFT} flex items-center gap-6 p-5 max-snug:flex-col max-snug:items-stretch max-snug:gap-4`}
+        href={view.url}
+      >
         <img
-          className={styles.awayCover}
+          className="w-[min(360px,46%)] shrink-0 rounded-lg border border-line object-cover max-snug:w-full"
           src={thumbImage(deck.slug, 1)}
           alt={`Cover slide of ${deck.title}`}
           style={{ aspectRatio: String(deck.aspect) }}
         />
-        <span className={styles.awayNote}>
-          <strong className={styles.awayLead}>
+        <span className="text-label leading-support text-muted">
+          <strong className="mb-1.5 block text-lead text-fg group-hover:text-accent">
             Open all {deck.pageCount} pages at the source ↗
           </strong>
           This deck is distributed by {view.host}. Only the cover slide is quoted here.
@@ -53,8 +63,8 @@ function Stage({
     <>
       <SlideViewer deck={deck} page={page} onPageChange={onPageChange} />
       {deck.video && (
-        <section className={styles.video}>
-          <h2 className={`mono ${styles.videoTitle}`}>TALK VIDEO</h2>
+        <section className="flex flex-col gap-3.5 pt-10">
+          <h2 className="font-mono text-note tracking-caps-wide text-faint">TALK VIDEO</h2>
           <VideoEmbed video={deck.video} title={deck.title} />
         </section>
       )}
@@ -67,10 +77,10 @@ function Source({ deck, view }: Part) {
   if (view.kind === 'video') {
     return (
       <>
-        <ExternalLink className={styles.download} href={view.url}>
+        <ExternalLink className={DOWNLOAD} href={view.url}>
           Watch on YouTube ↗
         </ExternalLink>
-        <p className={styles.sideNote}>No slides for this talk — recording only.</p>
+        <SideNote>No slides for this talk — recording only.</SideNote>
       </>
     )
   }
@@ -79,34 +89,46 @@ function Source({ deck, view }: Part) {
     // よそが配っている資料。取得元へ送り、こちらのコピーは配らない
     return (
       <>
-        <ExternalLink className={styles.download} href={view.url}>
+        <ExternalLink className={DOWNLOAD} href={view.url}>
           Open the original PDF ↗
         </ExternalLink>
-        <p className={styles.sideNote}>
+        <SideNote>
           {deck.pageCount} pages / hosted by {view.host}
-        </p>
+        </SideNote>
       </>
     )
   }
 
   return (
     <>
-      <a className={styles.download} href={pdfPath(deck.slug)} download>
+      <a className={DOWNLOAD} href={pdfPath(deck.slug)} download>
         Download PDF
       </a>
-      <p className={styles.sideNote}>
+      <SideNote>
         {deck.pageCount} pages / {FORMAT_LABEL[deck.format]}
-      </p>
+      </SideNote>
     </>
   )
 }
 
+function SideNote({ children }: { children: React.ReactNode }) {
+  return <p className="text-center text-note text-faint max-wide:text-left">{children}</p>
+}
+
 /** 前後のデッキへの送り先 */
-function Around({ deck, where, className }: { deck: Deck; where: string; className: string }) {
+function Around({ deck, where, align }: { deck: Deck; where: string; align?: 'right' }) {
   return (
-    <DeckLink deck={deck} className={className}>
-      <span className={`mono ${styles.aroundWhere}`}>{where}</span>
-      <span className={styles.aroundTitle} lang={textLang(deck.title)}>
+    <DeckLink
+      deck={deck}
+      className={`${LIFT} flex flex-col gap-1.5 px-5 py-4.5 ${
+        align === 'right' ? 'text-right max-snug:text-left' : ''
+      }`}
+    >
+      <span className="font-mono text-meta tracking-caps text-faint">{where}</span>
+      <span
+        className="text-body leading-normal font-semibold group-hover:text-accent"
+        lang={textLang(deck.title)}
+      >
         {deck.title}
       </span>
     </DeckLink>
@@ -132,18 +154,21 @@ export default function DeckDetail() {
 
   return (
     <div className="container">
-      <p className={styles.breadcrumb}>
+      <p className="font-mono pt-8 pb-5 text-label">
         <Link to="/slides">← Slides</Link>
       </p>
 
       <Stage deck={deck} view={view} page={page} onPageChange={goToPage} />
 
-      <div className={styles.detail}>
-        <div className={styles.main}>
-          <h1 className={styles.title} lang={textLang(deck.title)}>
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)_240px] gap-10 border-t border-t-line py-10 max-wide:grid-cols-1 max-wide:gap-7">
+        <div className="flex flex-col gap-3.5">
+          <h1
+            className="text-display-sm leading-[1.4] font-bold text-pretty"
+            lang={textLang(deck.title)}
+          >
             {deck.title}
           </h1>
-          <p className={`mono ${styles.meta}`}>
+          <p className="font-mono flex flex-wrap gap-x-4.5 gap-y-1.5 text-note text-faint">
             <span>{formatDeckDate(deck.date)}</span>
             {deck.event && <span>{deck.event}</span>}
             {deck.speaker && <span>{deck.speaker}</span>}
@@ -151,17 +176,20 @@ export default function DeckDetail() {
             <span>{FORMAT_LABEL[deck.format]}</span>
           </p>
           {deck.description && (
-            <p className={styles.desc} lang={textLang(deck.description)}>
+            <p
+              className="max-w-[620px] text-lead leading-lead text-pretty text-muted"
+              lang={textLang(deck.description)}
+            >
               {deck.description}
             </p>
           )}
 
-          <DeckTags tags={deck.tags} className={styles.tags} />
+          <DeckTags tags={deck.tags} className="flex flex-wrap gap-1.5" />
 
           {deck.links.length > 0 && (
-            <div className={styles.linkbox}>
-              <p className={`mono ${styles.linkTitle}`}>LINKS</p>
-              <ul className={styles.links}>
+            <div className="mt-2.5 flex flex-col gap-2">
+              <p className="font-mono text-meta tracking-caps-wide text-faint">LINKS</p>
+              <ul className="flex flex-col gap-1.5 text-body">
                 {deck.links.map((link) => (
                   <li key={link.url}>
                     <ExternalLink href={link.url}>{link.label} ↗</ExternalLink>
@@ -172,21 +200,18 @@ export default function DeckDetail() {
           )}
         </div>
 
-        <aside className={styles.side}>
+        <aside className="flex flex-col gap-2.5 max-wide:items-start">
           <Source deck={deck} view={view} />
         </aside>
       </div>
 
       {(older || newer) && (
-        <nav className={styles.around} aria-label="Other decks">
-          {older ? <Around deck={older} where="← OLDER" className={styles.aroundLink} /> : <span />}
-          {newer && (
-            <Around
-              deck={newer}
-              where="NEWER →"
-              className={`${styles.aroundLink} ${styles.aroundNext}`}
-            />
-          )}
+        <nav
+          className="grid grid-cols-2 gap-4 pb-2 max-snug:grid-cols-1"
+          aria-label="Other decks"
+        >
+          {older ? <Around deck={older} where="← OLDER" /> : <span />}
+          {newer && <Around deck={newer} where="NEWER →" align="right" />}
         </nav>
       )}
     </div>

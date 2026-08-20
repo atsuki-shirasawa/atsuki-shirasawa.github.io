@@ -21,7 +21,7 @@ export default function Career() {
           return (
             <div className="section-row py-4.5 max-narrow:gap-2" key={`${entry.from}-${entry.role}`}>
               {/* 在籍の長さがこの節でいちばん効く情報なので、最薄の扱いをやめる */}
-              <span className="mono flex flex-col gap-0.5 pt-0.5 text-label tabular-nums text-muted max-narrow:flex-row max-narrow:items-baseline max-narrow:gap-2 max-narrow:pt-0">
+              <span className="font-mono flex flex-col gap-0.5 pt-0.5 text-label tabular-nums text-muted max-narrow:flex-row max-narrow:items-baseline max-narrow:gap-2 max-narrow:pt-0">
                 {formatPeriod(entry.from, entry.to)}
                 <span className="text-meta text-faint">
                   {years} {years === 1 ? 'yr' : 'yrs'}

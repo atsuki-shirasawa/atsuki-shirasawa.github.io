@@ -52,7 +52,7 @@ export default function CareerTrack() {
       role="img"
       aria-label={`Career timeline: map data and computer vision from ${start} to ${present.from}, LLM agents from ${present.from} to now. The list below has the detail.`}
     >
-      <div className={`mono ${styles.eras}`} aria-hidden="true">
+      <div className={`font-mono ${styles.eras}`} aria-hidden="true">
         <span className={styles.era} style={{ left: 0, width: `${turn}%` }}>
           map data · computer vision
         </span>
@@ -78,7 +78,7 @@ export default function CareerTrack() {
         </div>
       </div>
 
-      <div className={`mono ${styles.years}`} aria-hidden="true">
+      <div className={`font-mono ${styles.years}`} aria-hidden="true">
         {ticks.map((year, index) => (
           <span
             className={styles.year}
