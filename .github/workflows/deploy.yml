@@ -21,9 +21,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -31,16 +31,20 @@ jobs:
       - run: npm ci
 
       # Marp のデッキは Chrome で PDF 化する。変わっていないデッキは
-      # scripts/build-decks.mjs のフィンガープリントで再生成を飛ばせるので、
+      # scripts/decks/cache.mjs のフィンガープリントで再生成を飛ばせるので、
       # その成果物とキャッシュを持ち越す。
       - name: Restore built decks
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             .cache
             public/decks
             public/pdfjs
-          key: decks-${{ hashFiles('decks/**', 'scripts/build-decks.mjs') }}
+          # 出力を作るコードも鍵に混ぜる。パイプラインは scripts/decks/ に
+          # 分かれていて build-decks.mjs は組み立てだけなので、そちらを外すと
+          # 「レンダリングを直したのに CI では前の絵が復元される」が起きる。
+          # OUTPUT_CONFIG.version を上げ忘れても、ここで空振りして作り直せる
+          key: decks-${{ hashFiles('decks/**', 'scripts/build-decks.mjs', 'scripts/decks/**') }}
           restore-keys: decks-
 
       - name: Fetch content and build
@@ -53,7 +57,7 @@ jobs:
           BASE_PATH: /
         run: npm run build
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
@@ -65,4 +69,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
