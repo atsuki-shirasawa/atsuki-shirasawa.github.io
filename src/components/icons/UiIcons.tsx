@@ -70,10 +70,16 @@ export function PlayIcon({ className }: ShapeProps) {
   )
 }
 
-/** 検索欄の虫めがね */
+/** 検索欄の虫めがね。端の丸めは形の一部なので持たせる（太さ・塗り・寸法は置いた側） */
 export function SearchIcon({ className }: ShapeProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.6-3.6" />
     </svg>

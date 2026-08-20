@@ -10,7 +10,10 @@
  * 入れる。11〜15px の 1px 刻みで階層を作っているので、text-sm と text-body が
  * 同義で並ぶ状態を残すと「どっちを書くか」がそのまま復活する。
  *
- * 値を足すときは、まずここに名前を付ける。utility に生の px を書かない。
+ * 値を足すときは、まずここに名前を付ける。ただし名前を付けるのは 2 箇所以上で
+ * 同じ意味で使う値だけ。1 箇所しかない光学的な微調整（ロゴの字送り、ツール
+ * チップの行送り）は arbitrary value で書き、なぜその値かをコメントに残す。
+ * 尺度でないものに尺度の名前を付けると、選ぶ基準がまた消える。
  */
 
 @theme {
@@ -38,6 +41,14 @@
   --color-zenn-fg: var(--zenn-fg);
   --color-qiita: var(--qiita);
   --color-qiita-fg: var(--qiita-fg);
+  --color-headerbg: var(--headerbg);
+
+  /* コントリビューションの濃さ 0〜4。強度は JS が持っているので bg-heat-N で引く */
+  --color-heat-0: var(--heat-0);
+  --color-heat-1: var(--heat-1);
+  --color-heat-2: var(--heat-2);
+  --color-heat-3: var(--heat-3);
+  --color-heat-4: var(--heat-4);
 }
 
 @theme {
@@ -55,27 +66,64 @@
    * 文字の大きさ。名前は用途で付ける。11 と 12 の差を「xs と sm」と呼ぶと
    * どちらを使うか決まらないが、「meta と note」なら決まる。
    */
+  --text-micro: 10px; /* ヒートマップの月ラベルだけ。読ませるためではなく位置を示す字 */
   --text-meta: 11px; /* 年数・ページ番号など、本文に添える最小の値 */
   --text-note: 12px; /* 日付・注記・フッター */
   --text-label: 13px; /* ラベル、小さな見出し、説明文 */
   --text-body: 14px; /* 本文 */
   --text-lead: 15px; /* 本文より一段強い行。役職名やリード文 */
+  --text-strong: 16px; /* サイト名 */
+
+  /* 数字を計器として読ませる大きさ。並ぶ数字と、その中の主役 1 つ */
+  --text-metric: 20px;
+  --text-metric-lead: 34px;
+
+  /* ページの見出し */
+  --text-page-title: 40px;
+  --text-page-title-sm: 30px;
 
   /* 行送り。本文系だけ名前を持たせる */
   --leading-title: 1.65; /* 折り返す見出し */
   --leading-prose: 1.7; /* 続けて読ませる文 */
+  --leading-lead: 1.85; /* 節や記事の導入。行間を空けて読み出しを軽くする */
 
   /*
    * 折り返し点。段組みを 1 列へ落とすところが 1 つあるだけで、
    * Tailwind の sm/md/lg（640/768/1024）とはどれも一致しない。
    */
-  --breakpoint-narrow: 45rem; /* 720px */
+  --breakpoint-narrow: 45rem; /* 720px — 段組みを 1 列へ落とす */
+  --breakpoint-tight: 35rem; /* 560px — カードの余白と数字の間を詰める */
+  --breakpoint-tiny: 30rem; /* 480px — 入りきらない導線を畳む */
 }
 
 /*
  * 意匠の primitive。同じ見た目が 3 箇所以上にあるものだけを置く。
  * @utility なので hover: や max-narrow: が付く。
  */
+
+/*
+ * 表示用の字。global.css が言うとおり 3 箇所だけに使う（名前・Slides の見出し・
+ * 年間コントリビューション）。幅（wdth）と行送りと字送りが束になっていて、
+ * 場所ごとに写すと必ずずれるので utility にした。大きさは使う側が決める。
+ */
+
+/** 名前と Slides の見出し */
+@utility display-title {
+  font-family: var(--font-display);
+  font-stretch: 118%;
+  font-variation-settings: 'wdth' 118;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+/** 主役の数字ひとつ。見出しより幅を狭め、行をもっと詰める */
+@utility display-metric {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-variation-settings: 'wdth' 112;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
 
 /*
  * CAREER / TECH STACK / WRITING に共通の「左に固定幅、右に中身」の行。
