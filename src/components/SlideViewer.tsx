@@ -1,6 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { ChevronIcon } from './icons/UiIcons'
+import { useFullscreen } from '../hooks/useFullscreen'
+import { useSlideKeys } from '../hooks/useSlideKeys'
+import { useSwipe } from '../hooks/useSwipe'
+import { clampPage } from '../lib/page'
+import {
+  cMapPath,
+  pdfPath,
+  posterImage,
+  standardFontPath,
+  thumbImage,
+  thumbTemplate,
+} from '../lib/paths'
 import { createSlideViewer, type SlideViewerHandle, type ViewerState } from '../lib/slideViewer'
-import { cMapPath, pdfPath, posterImage, standardFontPath, thumbImage, thumbTemplate } from '../lib/paths'
 import type { Deck } from '../types'
 import styles from './SlideViewer.module.css'
 
@@ -11,6 +23,10 @@ type Props = {
   onPageChange: (page: number) => void
 }
 
+/**
+ * ページ送りの操作（ボタン・キーボード・スワイプ）と現在ページの持ち方だけを見る。
+ * 描画とリサイズは lib/slideViewer.ts（React 非依存）に預けている。
+ */
 export default function SlideViewer({ deck, page, onPageChange }: Props) {
   const stageRef = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
@@ -27,9 +43,15 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
   const total = deck.pageCount
 
   const go = useCallback(
-    (next: number) => onPageChange(Math.min(Math.max(next, 1), total)),
+    (next: number) => onPageChange(clampPage(next, total)),
     [onPageChange, total],
   )
+
+  const turn = useCallback((direction: 1 | -1) => go(page + direction), [go, page])
+  const toggleFullscreen = useFullscreen(stageRef)
+
+  useSlideKeys({ page, total, go, onToggleFullscreen: toggleFullscreen })
+  useSwipe(stageRef, turn)
 
   // pdf.js のエンジンはデッキごとに 1 度だけ組み立てる
   useEffect(() => {
@@ -74,91 +96,6 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
     active?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' })
   }, [page])
 
-  // キーボード操作
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
-      if (event.metaKey || event.ctrlKey || event.altKey) return
-
-      switch (event.key) {
-        case 'ArrowRight':
-        case 'PageDown':
-        case ' ':
-          go(page + 1)
-          event.preventDefault()
-          break
-        case 'ArrowLeft':
-        case 'PageUp':
-          go(page - 1)
-          event.preventDefault()
-          break
-        case 'Home':
-          go(1)
-          event.preventDefault()
-          break
-        case 'End':
-          go(total)
-          event.preventDefault()
-          break
-        case 'f':
-        case 'F':
-          toggleFullscreen()
-          break
-        default:
-          break
-      }
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [go, page, total])
-
-  // タッチ端末のスワイプ
-  useEffect(() => {
-    const stage = stageRef.current
-    if (!stage) return
-    let startX = 0
-    let startY = 0
-    let tracking = false
-
-    const onDown = (event: PointerEvent) => {
-      if (event.pointerType === 'mouse') return
-      startX = event.clientX
-      startY = event.clientY
-      tracking = true
-    }
-    const onUp = (event: PointerEvent) => {
-      if (!tracking) return
-      tracking = false
-      // スライドの文字は選択できるので、文字を拾ったドラッグはスワイプではない
-      if (!document.getSelection()?.isCollapsed) return
-      const dx = event.clientX - startX
-      const dy = event.clientY - startY
-      if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return
-      go(page + (dx < 0 ? 1 : -1))
-    }
-    const onCancel = () => {
-      tracking = false
-    }
-
-    stage.addEventListener('pointerdown', onDown)
-    stage.addEventListener('pointerup', onUp)
-    stage.addEventListener('pointercancel', onCancel)
-    return () => {
-      stage.removeEventListener('pointerdown', onDown)
-      stage.removeEventListener('pointerup', onUp)
-      stage.removeEventListener('pointercancel', onCancel)
-    }
-  }, [go, page])
-
-  function toggleFullscreen() {
-    if (document.fullscreenElement) {
-      void document.exitFullscreen()
-    } else {
-      void stageRef.current?.requestFullscreen?.()
-    }
-  }
-
   return (
     <section
       className={styles.viewer}
@@ -201,9 +138,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
           onClick={() => go(page - 1)}
           disabled={page <= 1}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15 4 7 12l8 8" />
-          </svg>
+          <ChevronIcon direction="left" />
           <span className="visually-hidden">Previous slide</span>
         </button>
         <button
@@ -213,9 +148,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
           onClick={() => go(page + 1)}
           disabled={page >= total}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 4l8 8-8 8" />
-          </svg>
+          <ChevronIcon direction="right" />
           <span className="visually-hidden">Next slide</span>
         </button>
       </div>

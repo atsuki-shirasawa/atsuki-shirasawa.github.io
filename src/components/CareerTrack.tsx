@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { career } from '../data/profile'
+import { currentYear } from '../lib/time'
 import styles from './CareerTrack.module.css'
 
 /**
@@ -14,7 +15,7 @@ export default function CareerTrack() {
   // 古い順に並べ直して左から右へ
   const ordered = [...career].sort((a, b) => a.from - b.from)
   const start = ordered[0].from
-  const end = new Date().getFullYear()
+  const end = currentYear
   const span = Math.max(end - start, 1)
   /** 年をトラック上の位置（%）に直す */
   const at = (year: number) => ((year - start) / span) * 100

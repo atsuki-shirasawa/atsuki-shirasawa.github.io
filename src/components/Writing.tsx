@@ -1,3 +1,4 @@
+import ExternalLink from './ExternalLink'
 import { posts } from '../data/content'
 import { profile } from '../data/profile'
 import { textLang } from '../lib/lang'
@@ -25,17 +26,15 @@ export default function Writing() {
         <h2 className="section-title">WRITING</h2>
         <div className="section-links">
           {authorProfiles.map((entry) => (
-            <a
+            <ExternalLink
               className={`tap ${styles.profile}`}
               data-site={entry.site}
               href={entry.url}
-              target="_blank"
-              rel="noreferrer"
               key={entry.site}
             >
               <SiteIcon site={entry.site} size={13} />
               {entry.label} ↗
-            </a>
+            </ExternalLink>
           ))}
         </div>
       </div>
@@ -44,7 +43,7 @@ export default function Writing() {
         {ordered.map((post) => (
           <li className={styles.row} key={post.url}>
             <span className={`mono ${styles.date}`}>{post.date}</span>
-            <a className={`tap ${styles.link}`} href={post.url} target="_blank" rel="noreferrer">
+            <ExternalLink className={`tap ${styles.link}`} href={post.url}>
               <span className={styles.mark} data-site={post.site} aria-hidden="true">
                 <SiteIcon site={post.site} size={13} />
               </span>
@@ -53,7 +52,7 @@ export default function Writing() {
               </span>
               {/* アイコンは読み上げないので、媒体は言葉でも渡す */}
               <span className="visually-hidden">on {post.site}</span>
-            </a>
+            </ExternalLink>
           </li>
         ))}
       </ul>

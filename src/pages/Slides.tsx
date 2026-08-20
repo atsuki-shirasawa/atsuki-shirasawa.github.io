@@ -1,62 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
 import DeckCard from '../components/DeckCard'
-import { deckHaystack, decks, tagIndex } from '../data/decks'
-import { searchIndexPath } from '../lib/paths'
+import { SearchIcon } from '../components/icons/UiIcons'
+import { decks, tagIndex } from '../data/decks'
+import { useDeckSearch } from '../hooks/useDeckSearch'
+import { useQueryUpdate } from '../hooks/useQueryUpdate'
 import styles from './Slides.module.css'
-
-type SearchEntry = { slug: string; text: string }
 
 /** これを下回るあいだは検索とタグを畳んでおく */
 const CONTROLS_MIN_DECKS = 4
 
 export default function Slides() {
-  const [params, setParams] = useSearchParams()
+  const [params, update] = useQueryUpdate()
   const query = params.get('q') ?? ''
   const activeTag = params.get('tag') ?? ''
-
-  /** スライド本文。最初の検索が始まるまで読みに行かない */
-  const [fullText, setFullText] = useState<Map<string, string> | null>(null)
-  const loading = useRef<Promise<void> | null>(null)
 
   useEffect(() => {
     document.title = 'Slides — Atsuki Shirasawa'
   }, [])
 
-  useEffect(() => {
-    if (query.trim() === '' || loading.current) return
-    loading.current = fetch(searchIndexPath())
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
-      .then((entries: SearchEntry[]) => {
-        setFullText(new Map(entries.map((entry) => [entry.slug, entry.text.toLowerCase()])))
-      })
-      .catch(() => {
-        // 本文が読めなくても、タイトルとタグの検索は続けられる
-        setFullText(new Map())
-      })
-  }, [query])
-
   const tags = useMemo(() => tagIndex(), [])
-
-  const results = useMemo(() => {
-    const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
-    return decks.filter((deck) => {
-      if (activeTag && !deck.tags.some((tag) => tag.toLowerCase() === activeTag.toLowerCase())) return false
-      if (words.length === 0) return true
-      const meta = deckHaystack(deck)
-      const body = fullText?.get(deck.slug) ?? ''
-      return words.every((word) => meta.includes(word) || body.includes(word))
-    })
-  }, [query, activeTag, fullText])
-
-  const update = (next: { q?: string; tag?: string }) => {
-    const merged = new URLSearchParams(params)
-    for (const [key, value] of Object.entries(next)) {
-      if (value) merged.set(key, value)
-      else merged.delete(key)
-    }
-    setParams(merged, { replace: true })
-  }
+  const results = useDeckSearch(query, activeTag)
 
   const filtered = query.trim() !== '' || activeTag !== ''
   /**
@@ -79,10 +42,7 @@ export default function Slides() {
         {showControls && (
           <div className={styles.controls}>
             <div className={styles.searchBox}>
-              <svg className={styles.searchIcon} viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.6-3.6" />
-              </svg>
+              <SearchIcon className={styles.searchIcon} />
               <input
                 className={styles.search}
                 type="search"
@@ -97,7 +57,7 @@ export default function Slides() {
               <div className={styles.tags}>
                 {tags.map(({ tag, count }) => (
                   <button
-                    className={`mono ${styles.tag}`}
+                    className="chip"
                     type="button"
                     key={tag}
                     aria-pressed={tag.toLowerCase() === activeTag.toLowerCase()}
@@ -118,7 +78,11 @@ export default function Slides() {
           <p className={`mono ${styles.status}`} aria-live="polite">
             {results.length} {results.length === 1 ? 'result' : 'results'}
             {activeTag && ` / tag: ${activeTag}`}
-            <button className={`tap ${styles.clear}`} type="button" onClick={() => update({ q: '', tag: '' })}>
+            <button
+              className={`tap ${styles.clear}`}
+              type="button"
+              onClick={() => update({ q: '', tag: '' })}
+            >
               Clear
             </button>
           </p>

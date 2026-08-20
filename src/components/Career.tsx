@@ -1,4 +1,5 @@
 import { career } from '../data/profile'
+import { currentYear } from '../lib/time'
 import styles from './Career.module.css'
 
 /** 2010 — 2016 / 2022 — Present */
@@ -14,7 +15,7 @@ export default function Career() {
       </div>
       <div>
         {career.map((entry, index) => {
-          const years = (entry.to ?? new Date().getFullYear()) - entry.from
+          const years = (entry.to ?? currentYear) - entry.from
           // 勤め先は変わったときだけ出す。同じ会社の中の異動で繰り返さない
           const showOrg = entry.org && entry.org !== career[index - 1]?.org
 

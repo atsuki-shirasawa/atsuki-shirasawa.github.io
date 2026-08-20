@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import ExternalLink from './ExternalLink'
 import YouTubeThumb from './YouTubeThumb'
+import { PlayIcon } from './icons/UiIcons'
 import { watchUrl } from '../lib/video'
 import type { DeckVideo } from '../types'
 import styles from './VideoEmbed.module.css'
@@ -44,14 +46,12 @@ export default function VideoEmbed({ video, title }: Props) {
       >
         <YouTubeThumb id={video.id} className={styles.thumb} />
         <span className={styles.play} aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M8 5.5v13l11-6.5z" />
-          </svg>
+          <PlayIcon />
         </span>
       </button>
-      <a className={styles.external} href={watchUrl(video)} target="_blank" rel="noreferrer">
+      <ExternalLink className={styles.external} href={watchUrl(video)}>
         Watch on YouTube ↗
-      </a>
+      </ExternalLink>
     </div>
   )
 }

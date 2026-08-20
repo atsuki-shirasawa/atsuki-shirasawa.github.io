@@ -4,17 +4,13 @@
 
 .head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: flex-end;
   margin-bottom: 14px;
 }
 
 .nav {
   display: flex;
   gap: 6px;
-  /* 帯に head が無いレールでも右端に寄せる */
-  margin-left: auto;
 }
 
 .arrow {

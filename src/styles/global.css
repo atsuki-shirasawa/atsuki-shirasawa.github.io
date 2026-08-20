@@ -192,6 +192,41 @@ p {
   font-family: var(--font-mono);
 }
 
+/* タグなどの丸いチップ。一覧の絞り込み・カード・詳細の 3 箇所で同じ物なのに、
+   module ごとに padding も hover もずれていたので、ここに寄せた。
+   ボタンにもリンクにも付くので、どちらでも同じに見えるところまで書く */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* 当たり判定を 24px 角（WCAG 2.5.8）に届かせる */
+  padding: 5px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--chipbg);
+  color: var(--chipfg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.chip:hover {
+  background: color-mix(in srgb, var(--accent), transparent 88%);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* 押されたままになるのは絞り込みのタグだけ。ホバーとは枠線で見分ける */
+.chip[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent), transparent 84%);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* 指で触る環境では、見た目はそのままに当たり判定だけ 44px 角へ広げる。
    フレックスの子に付けることを前提にしている（絶対配置なので中身の並びは動かない） */
 @media (pointer: coarse) {
@@ -207,6 +242,11 @@ p {
     translate: -50% -50%;
     width: max(100%, 44px);
     height: max(100%, 44px);
+  }
+
+  /* チップは折り返す行に並ぶので当たり判定を重ねられない。実寸を広げる */
+  .chip {
+    padding: 9px 14px;
   }
 }
 

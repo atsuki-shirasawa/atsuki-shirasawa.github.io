@@ -1,6 +1,8 @@
-import { Link } from 'react-router-dom'
+import DeckLink from './DeckLink'
+import DeckTags from './DeckTags'
 import YouTubeThumb from './YouTubeThumb'
-import { deckAway, formatDeckDate, hostOf, previewPages } from '../data/decks'
+import { PlayIcon } from './icons/UiIcons'
+import { deckView, formatDeckDate, previewPages } from '../lib/deckView'
 import { textLang } from '../lib/lang'
 import { thumbImage } from '../lib/paths'
 import type { Deck } from '../types'
@@ -14,103 +16,66 @@ type Props = {
 }
 
 export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
-  /** スライドが無く、録画だけの登壇。カードの絵は動画のサムネイルになる */
-  const videoOnly = deck.format === 'video'
-  const pages = previewPages(deck)
-  /** よそに実体がある登壇（配布元の PDF、録画だけの YouTube）はそのまま外へ送る */
-  const away = deckAway(deck)
-
-  const body = (
-    <>
-      <div className={styles.stage} style={{ aspectRatio: String(deck.aspect) }}>
-        {videoOnly && deck.video ? (
-          <YouTubeThumb
-            id={deck.video.id}
-            className={styles.page}
-            alt={`Talk video for ${deck.title}`}
-            loading={eager ? 'eager' : 'lazy'}
-          />
-        ) : (
-          pages.map((page, index) => (
-            <img
-              className={styles.page}
-              key={page}
-              src={thumbImage(deck.slug, page)}
-              alt={index === 0 ? `Cover slide of ${deck.title}` : ''}
-              aria-hidden={index > 0 ? 'true' : undefined}
-              loading={eager && index === 0 ? 'eager' : 'lazy'}
-              decoding="async"
-              style={{ '--i': index } as React.CSSProperties}
-            />
-          ))
-        )}
-
-        {deck.video && (
-          <p className={styles.hasVideo} data-lead={videoOnly ? 'true' : undefined} title="Talk video">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 5.5v13l11-6.5z" />
-            </svg>
-            <span className="visually-hidden">Talk video available</span>
-          </p>
-        )}
-
-        {!videoOnly && (
-          <p className={`mono ${styles.count}`}>
-            {deck.pageCount}
-            <span className={styles.countUnit}>p</span>
-          </p>
-        )}
-      </div>
-      <h3 className={styles.title} lang={textLang(deck.title)}>
-        {deck.title}
-      </h3>
-    </>
-  )
+  const view = deckView(deck)
 
   return (
     <article className={styles.card}>
-      {away ? (
-        <a className={styles.hit} href={away} target="_blank" rel="noreferrer">
-          {body}
-        </a>
-      ) : (
-        <Link className={styles.hit} to={`/slides/${deck.slug}`}>
-          {body}
-        </Link>
-      )}
+      <DeckLink deck={deck} className={styles.hit}>
+        <div className={styles.stage} style={{ aspectRatio: String(deck.aspect) }}>
+          {view.kind === 'video' ? (
+            // 録画だけの登壇。カードの絵は動画のサムネイルになる
+            <YouTubeThumb
+              id={view.video.id}
+              className={styles.page}
+              alt={`Talk video for ${deck.title}`}
+              loading={eager ? 'eager' : 'lazy'}
+            />
+          ) : (
+            previewPages(deck, view).map((page, index) => (
+              <img
+                className={styles.page}
+                key={page}
+                src={thumbImage(deck.slug, page)}
+                alt={index === 0 ? `Cover slide of ${deck.title}` : ''}
+                aria-hidden={index > 0 ? 'true' : undefined}
+                loading={eager && index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                style={{ '--i': index } as React.CSSProperties}
+              />
+            ))
+          )}
+
+          {deck.video && (
+            <p
+              className={styles.hasVideo}
+              data-lead={view.kind === 'video' ? 'true' : undefined}
+              title="Talk video"
+            >
+              <PlayIcon />
+              <span className="visually-hidden">Talk video available</span>
+            </p>
+          )}
+
+          {view.kind !== 'video' && (
+            <p className={`mono ${styles.count}`}>
+              {deck.pageCount}
+              <span className={styles.countUnit}>p</span>
+            </p>
+          )}
+        </div>
+        <h3 className={styles.title} lang={textLang(deck.title)}>
+          {deck.title}
+        </h3>
+      </DeckLink>
 
       <p className={`mono ${styles.meta}`}>
         <span>{formatDeckDate(deck.date)}</span>
         {deck.event && <span className={styles.event}>{deck.event}</span>}
-        {away && <span className={styles.away}>{hostOf(away)} ↗</span>}
+        {/* 外へ出るカードは、どこへ行くのかを先に見せる */}
+        {view.kind !== 'viewer' && <span className={styles.away}>{view.host} ↗</span>}
       </p>
 
-      {deck.tags.length > 0 && (
-        <p className={styles.tags}>
-          {deck.tags.map((tag) =>
-            onTagClick ? (
-              <button
-                className={`mono ${styles.tag}`}
-                type="button"
-                key={tag}
-                onClick={() => onTagClick(tag)}
-              >
-                {tag}
-              </button>
-            ) : (
-              // 一覧の外（Home の TALKS）には絞り込む相手がいないので、
-              // そのタグで絞った一覧へ送る。DeckDetail のタグと同じ行き先
-              <Link
-                className={`mono ${styles.tag}`}
-                key={tag}
-                to={`/slides?tag=${encodeURIComponent(tag)}`}
-              >
-                {tag}
-              </Link>
-            ),
-          )}
-        </p>
-      )}
+      <DeckTags tags={deck.tags} className={styles.tags} onTagClick={onTagClick} />
     </article>
   )
 }

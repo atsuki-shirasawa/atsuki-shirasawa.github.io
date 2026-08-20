@@ -1,10 +1,14 @@
 // decks/<slug>/index.md から scripts/build-decks.mjs が生成したメタデータ。
 // スライド本文（検索用テキスト）は public/decks-search.json 側にあり、
 // 検索が始まったときだけ取りに行く。
+//
+// ここは「一覧に対する問い」だけを持つ。1 件をどう見せるか（自前のビューアか、
+// よその配布元か、録画だけか）は src/lib/deckView.ts。
 import generated from './decks.json'
-import { watchUrl } from '../lib/video'
 import type { Deck } from '../types'
 
+// 形は書き出す側（scripts/decks/record.mjs）が検査してから書いているので、
+// ここで信じてよい
 /** 新しい順（並び順は build-decks.mjs が決めている） */
 export const decks: Deck[] = (generated as { decks: Deck[] }).decks
 
@@ -31,38 +35,6 @@ export function tagIndex(): { tag: string; count: number }[] {
     }
   }
   return [...counts.values()].sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
-}
-
-/** 2026-07-30 を 2026.07.30 に */
-export function formatDeckDate(date: string | null): string {
-  if (!date) return ''
-  return date.replaceAll('-', '.')
-}
-
-/**
- * カードを押したときの外部の飛び先。よそが配っている資料はその配布元へ、
- * スライドが無く録画だけの登壇は YouTube へ送る。自前のスライドを持つ
- * デッキだけが null になり、こちらのビューアで開く
- */
-export function deckAway(deck: Deck): string | null {
-  if (deck.source) return deck.source
-  if (deck.format === 'video' && deck.video) return watchUrl(deck.video)
-  return null
-}
-
-/** 見せるためのホスト名。www. は落とす */
-export function hostOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '')
-  } catch {
-    return url
-  }
-}
-
-/** カードのめくりプレビューに使うページ（最大 4 枚）。借りものの資料は表紙だけ */
-export function previewPages(deck: Deck): number[] {
-  const shown = deck.source ? 1 : Math.min(deck.pageCount, 4)
-  return Array.from({ length: shown }, (_, index) => index + 1)
 }
 
 /** 検索対象にする、本文以外のテキスト */

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import ExternalLink from './ExternalLink'
 import { profile } from '../data/profile'
 import { GitHubIcon } from './icons/BrandIcons'
 import { MoonIcon, SlidesIcon, SunIcon } from './icons/UiIcons'
@@ -28,15 +29,10 @@ export default function Header({ isDark, onToggleTheme }: Props) {
             <SlidesIcon size={14} />
             Slides
           </NavLink>
-          <a
-            className={`tap ${styles.navExternal}`}
-            href={profile.links.github}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <ExternalLink className={`tap ${styles.navExternal}`} href={profile.links.github}>
             <GitHubIcon size={14} />
             GitHub ↗
-          </a>
+          </ExternalLink>
           <button
             type="button"
             className={`tap ${styles.themeToggle}`}

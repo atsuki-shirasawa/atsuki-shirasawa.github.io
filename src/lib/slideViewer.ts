@@ -7,6 +7,7 @@
  * ページ送りの操作（ボタン・キーボード・スワイプ）と現在ページの管理は React 側。
  */
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import { clampPage } from './page'
 
 /** Retina までは払う価値がある。それ以上はファイルサイズが増えるだけで見た目は変わらない */
 const MAX_DPR = 2
@@ -66,15 +67,11 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
   let doc: any = null
   /** ページを移るたびに増える。古い番号を持って戻ってきたものは捨てる */
   let token = 0
-  let current = clamp(options.initialPage)
+  let current = clampPage(options.initialPage, total)
   let lastPage: Page | null = null
   let disposed = false
   const cache = new Map<number, Shot>()
   const inflight = new Map<number, Draw>()
-
-  function clamp(page: number) {
-    return Math.min(Math.max(page, 1), total)
-  }
 
   /**
    * レイヤーは投げっぱなしで完了させる。握り潰すと「テキストもリンクも無いページ」と
@@ -277,7 +274,7 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
 
   const show = async (pageNumber: number) => {
     if (disposed) return
-    current = clamp(pageNumber)
+    current = clampPage(pageNumber, total)
 
     if (!doc) {
       // pdf.js がまだか、来ないとき。フィルムストリップ用の静止画がすべて

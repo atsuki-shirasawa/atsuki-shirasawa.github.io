@@ -1,8 +1,15 @@
-// UI 用のアイコン。Feather Icons（MIT）の描き方を下敷きに、
-// Carousel の矢印と同じ線幅・同じ端の丸めで揃えている。
+// UI 用のアイコン。Feather Icons（MIT）の描き方を下敷きに、線幅と端の丸めを揃えている。
+//
+// 2 種類ある。size を取るものは自分で線を引く（ヘッダのように寸法が 1 つに決まる場所）。
+// className だけを取るものは形しか持たず、太さ・塗り・寸法は置いた側の CSS が決める
+// （矢印や再生ボタンは同じ形を大小で使い回すので、そちらに任せる方が素直）。
 
 type IconProps = {
   size?: number
+}
+
+type ShapeProps = {
+  className?: string
 }
 
 const stroke = {
@@ -38,6 +45,37 @@ export function SlidesIcon({ size = 16 }: IconProps) {
     <svg width={size} height={size} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
       <rect x="3" y="4" width="18" height="12" rx="2" />
       <path d="M12 16v4M8.5 20h7" />
+    </svg>
+  )
+}
+
+/** 前後に送る矢印。レール（Carousel）とスライドのページ送りで共有している */
+export function ChevronIcon({
+  direction,
+  className,
+}: ShapeProps & { direction: 'left' | 'right' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={direction === 'left' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'} />
+    </svg>
+  )
+}
+
+/** 再生。動画のあるカードの印と、埋め込みの再生ボタンで共有している */
+export function PlayIcon({ className }: ShapeProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M8 5.5v13l11-6.5z" />
+    </svg>
+  )
+}
+
+/** 検索欄の虫めがね */
+export function SearchIcon({ className }: ShapeProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.6-3.6" />
     </svg>
   )
 }

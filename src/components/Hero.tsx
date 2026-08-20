@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import CareerTrack from './CareerTrack'
+import ExternalLink from './ExternalLink'
 import { github } from '../data/content'
 import { profile } from '../data/profile'
 import { QiitaIcon, ZennIcon } from './icons/BrandIcons'
@@ -17,11 +18,9 @@ export default function Hero() {
         </div>
 
         {github.avatarUrl && (
-          <a
+          <ExternalLink
             className={styles.avatarLink}
             href={profile.links.github}
-            target="_blank"
-            rel="noreferrer"
             title={`github.com/${github.login}`}
           >
             <img
@@ -31,7 +30,7 @@ export default function Hero() {
               width={200}
               height={200}
             />
-          </a>
+          </ExternalLink>
         )}
       </div>
 
@@ -41,24 +40,20 @@ export default function Hero() {
         <Link className={`${styles.button} ${styles.buttonPrimary}`} to="/slides">
           Slides <span aria-hidden="true">→</span>
         </Link>
-        <a
+        <ExternalLink
           className={`${styles.button} ${styles.buttonOutline} ${styles.buttonZenn}`}
           href={profile.links.zenn}
-          target="_blank"
-          rel="noreferrer"
         >
           <ZennIcon size={15} />
           Zenn
-        </a>
-        <a
+        </ExternalLink>
+        <ExternalLink
           className={`${styles.button} ${styles.buttonOutline} ${styles.buttonQiita}`}
           href={profile.links.qiita}
-          target="_blank"
-          rel="noreferrer"
         >
           <QiitaIcon size={15} />
           Qiita
-        </a>
+        </ExternalLink>
       </div>
     </section>
   )
