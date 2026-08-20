@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { profile } from '../data/profile'
-import { MoonIcon, SunIcon } from './icons/UiIcons'
+import { GitHubIcon } from './icons/BrandIcons'
+import { MoonIcon, SlidesIcon, SunIcon } from './icons/UiIcons'
 import styles from './Header.module.css'
 
 type Props = {
@@ -24,6 +25,7 @@ export default function Header({ isDark, onToggleTheme }: Props) {
             Home
           </NavLink>
           <NavLink to="/slides" className={navClass}>
+            <SlidesIcon size={14} />
             Slides
           </NavLink>
           <a
@@ -32,6 +34,7 @@ export default function Header({ isDark, onToggleTheme }: Props) {
             target="_blank"
             rel="noreferrer"
           >
+            <GitHubIcon size={14} />
             GitHub ↗
           </a>
           <button

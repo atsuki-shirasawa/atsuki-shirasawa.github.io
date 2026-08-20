@@ -51,6 +51,9 @@
   color: var(--muted);
   padding-bottom: 2px;
   border-bottom: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .navLink:hover {
@@ -66,6 +69,9 @@
 .navExternal {
   color: var(--muted);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .navExternal:hover {

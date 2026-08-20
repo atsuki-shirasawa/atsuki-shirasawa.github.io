@@ -31,3 +31,13 @@ export function MoonIcon({ size = 16 }: IconProps) {
     </svg>
   )
 }
+
+/** Slides への導線に出すスクリーン（スタンド付き） */
+export function SlidesIcon({ size = 16 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...stroke} aria-hidden="true" focusable="false">
+      <rect x="3" y="4" width="18" height="12" rx="2" />
+      <path d="M12 16v4M8.5 20h7" />
+    </svg>
+  )
+}
