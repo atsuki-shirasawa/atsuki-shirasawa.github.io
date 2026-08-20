@@ -73,59 +73,52 @@ html[data-theme='dark'] {
   --heat-4: #3ec9a7;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/*
+ * 要素そのものの既定は @layer base に置く。レイヤーの外に出すと utility より
+ * 強くなり、hover:text-accent が a:hover に負ける（レイヤー無しは常に勝つ）。
+ * 逆に、下のクラス群はレイヤーに入れない — CSS Modules もレイヤー外なので、
+ * 入れると module 側が必ず勝つようになり、勝ち負けの向きが変わってしまう。
+ */
+@layer base {
+  html,
+  body {
+    background: var(--bg);
+    /*
+     * preflight は html に line-height: 1.5 を敷くが、この設計は行送りを
+     * 要る場所だけで指定している（1.4 / 1.65 / 1.7 / 1.85）。1.5 を通すと
+     * 指定の無い 1 行ラベルが一斉に 3px 高くなる。既定へ戻して、基準の
+     * 行送りを持つかどうかは別に決める。
+     */
+    line-height: normal;
+  }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  /*
-   * Tailwind の preflight は html に line-height: 1.5 を敷くが、この設計は
-   * 行送りを要る場所だけで指定している（1.4 / 1.65 / 1.7 / 1.85）。1.5 を
-   * 通すと、指定の無い 1 行ラベルが一斉に 3px 高くなる。既定へ戻して、
-   * 基準の行送りを持つかどうかは別に決める。
-   */
-  line-height: normal;
-}
+  body {
+    font-family: var(--font-sans);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.25s;
+  }
 
-body {
-  font-family: var(--font-sans);
-  color: var(--fg);
-  -webkit-font-smoothing: antialiased;
-  transition: background 0.25s;
-}
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
 
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
+  a:hover {
+    color: var(--accent2);
+    text-decoration: underline;
+  }
 
-a:hover {
-  color: var(--accent2);
-  text-decoration: underline;
-}
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-fg);
+  }
 
-::selection {
-  background: var(--selection-bg);
-  color: var(--selection-fg);
-}
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-h1,
-h2,
-h3,
-p {
-  margin: 0;
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 /* --- 共通レイアウト --- */

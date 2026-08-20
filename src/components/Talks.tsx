@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import Carousel from './Carousel'
 import DeckCard from './DeckCard'
 import { decks } from '../data/decks'
-import styles from './Talks.module.css'
 
 export default function Talks() {
   if (decks.length === 0) return null
@@ -11,7 +10,10 @@ export default function Talks() {
     <section className="section">
       <div className="section-head">
         <h2 className="section-title">TALKS</h2>
-        <Link className={`tap ${styles.all}`} to="/slides">
+        <Link
+          className="tap text-label text-muted transition-colors hover:text-accent hover:no-underline"
+          to="/slides"
+        >
           All talks <span aria-hidden="true">→</span>
         </Link>
       </div>

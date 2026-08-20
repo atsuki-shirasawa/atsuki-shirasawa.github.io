@@ -1,6 +1,5 @@
 import { career } from '../data/profile'
 import { currentYear } from '../lib/time'
-import styles from './Career.module.css'
 
 /** 2010 — 2016 / 2022 — Present */
 function formatPeriod(from: number, to: number | null) {
@@ -20,19 +19,26 @@ export default function Career() {
           const showOrg = entry.org && entry.org !== career[index - 1]?.org
 
           return (
-            <div className={styles.row} key={`${entry.from}-${entry.role}`}>
-              <span className={`mono ${styles.period}`}>
+            <div className="section-row py-4.5 max-narrow:gap-2" key={`${entry.from}-${entry.role}`}>
+              {/* 在籍の長さがこの節でいちばん効く情報なので、最薄の扱いをやめる */}
+              <span className="mono flex flex-col gap-0.5 pt-0.5 text-label tabular-nums text-muted max-narrow:flex-row max-narrow:items-baseline max-narrow:gap-2 max-narrow:pt-0">
                 {formatPeriod(entry.from, entry.to)}
-                <span className={styles.years}>
+                <span className="text-meta text-faint">
                   {years} {years === 1 ? 'yr' : 'yrs'}
                 </span>
               </span>
-              <div className={styles.body}>
-                <span className={styles.role}>
+              <div className="flex flex-col gap-1">
+                <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-lead font-semibold">
                   {entry.role}
-                  {showOrg && <span className={styles.org}>{entry.org}</span>}
+                  {/* 社名は伏せた表記。役職より一段落として添える。折り返して行頭に
+                      来たスラッシュは迷子に見えるので、たたんだら落とす */}
+                  {showOrg && (
+                    <span className="text-label font-medium text-faint before:pr-2.5 before:text-line before:content-['/'] max-narrow:before:content-none">
+                      {entry.org}
+                    </span>
+                  )}
                 </span>
-                <span className={styles.desc}>{entry.desc}</span>
+                <span className="text-label leading-prose text-muted">{entry.desc}</span>
               </div>
             </div>
           )
