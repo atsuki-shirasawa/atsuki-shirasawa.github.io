@@ -1,8 +1,8 @@
 // UI 用のアイコン。Feather Icons（MIT）の描き方を下敷きに、線幅と端の丸めを揃えている。
 //
-// 2 種類ある。size を取るものは自分で線を引く（ヘッダのように寸法が 1 つに決まる場所）。
-// className だけを取るものは形しか持たず、太さ・塗り・寸法は置いた側の CSS が決める
-// （矢印や再生ボタンは同じ形を大小で使い回すので、そちらに任せる方が素直）。
+// 線か塗りか（`fill: none` / `stroke: currentColor` / 太さ / 端の丸め）は形の一部なので
+// アイコンが持つ。**寸法と色は置いた側**が持つ — 同じ形を大小で使い回すため。
+// size を取るのは寸法が 1 つに決まる場所（ヘッダ）だけで、あとは className で受ける。
 
 type IconProps = {
   size?: number
@@ -49,13 +49,22 @@ export function SlidesIcon({ size = 16 }: IconProps) {
   )
 }
 
-/** 前後に送る矢印。レール（Carousel）とスライドのページ送りで共有している */
+/**
+ * 前後に送る矢印。レール（Carousel）とスライドのページ送りで共有している。
+ * 線の引き方は同じで寸法だけが違う（15px と 20px）ので、線はここが持つ。
+ */
 export function ChevronIcon({
   direction,
   className,
 }: ShapeProps & { direction: 'left' | 'right' }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      {...stroke}
+      aria-hidden="true"
+      focusable="false"
+    >
       <path d={direction === 'left' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'} />
     </svg>
   )

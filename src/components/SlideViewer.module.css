@@ -209,14 +209,10 @@
     scale 0.25s;
 }
 
+/* 線の引き方は ChevronIcon が持つ。ここは寸法だけ */
 .nav svg {
   width: 20px;
   height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
 }
 
 .nav[data-nav='prev'] {

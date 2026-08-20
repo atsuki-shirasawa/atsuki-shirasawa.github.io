@@ -163,15 +163,24 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
 
 ### CSS Modules で残す 3 本
 
-**共有するものが無く、utility に潰すと現状より読みにくくなるもの**だけ。
-`@keyframes` は module に残る理由にならない（`--animate-*` として `@theme` に
-置ける。`page-turn` がそうなっている）。
+**module を選ぶ基準は 1 つ。utility に移すと arbitrary value が増えるだけのとき。**
+arbitrary value には**なぜその値かを書く場所が無い**ので、1 回きりの値ばかりの
+ものを移すと、名前を付けるためにやった移行が逆回しになる。
 
-| ファイル | 残す理由 |
+`@keyframes` は残る理由にならない（`--animate-*` として `@theme` に置ける。
+`page-turn` がそうなっている）。「@media が要る」「子孫セレクタが要る」も違う
+（`max-narrow:` と `group-hover:` / `group-data-*:` がある）。
+
+| ファイル | 移すと増える arbitrary |
 | --- | --- |
-| `SlideViewer.module.css` | pdf.js が実行時に作る DOM（`:global(.textLayer)`）に className を渡せない |
-| `CareerTrack.module.css` | 経歴の線。10 要素すべてが 1 回きりの絶対配置で、独自の cubic-bezier と遅延を持つ。共有するものが無い |
-| `Carousel.module.css` | `::-webkit-scrollbar`。レールの 12 宣言も他に出てこない |
+| `SlideViewer.module.css` | そもそも移せない。pdf.js が実行時に作る DOM（`:global(.textLayer)`）に className を渡せない |
+| `CareerTrack.module.css` | 7 つ。cubic-bezier 2 つ、`clip-path` 2 つ、`color-mix()` の破線色、`box-shadow`、字送り。10 要素すべてが 1 回きりの絶対配置で、共有するものが無い |
+| `Carousel.module.css` | 3 つ + 1 回しか使わない `@utility`（`::-webkit-scrollbar` に変種が無い）。レールの 12 宣言も他に出てこない |
+
+逆に、**module に残っていても共有できるものは共有する**。矢印の線
+（`fill: none` / `stroke: currentColor` / 太さ / 端の丸め）は 2 つの module が
+同じ 5 宣言を写していたので、`ChevronIcon` に持たせて寸法だけ残した。
+アイコンは**線か塗りかを自分で持ち、寸法と色は置いた側**が持つ。
 
 ### 分かっている残り
 

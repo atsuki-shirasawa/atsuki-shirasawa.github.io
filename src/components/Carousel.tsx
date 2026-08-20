@@ -40,7 +40,7 @@ export default function Carousel({ name, children }: Props) {
   }
 
   return (
-    <div className={styles.group}>
+    <div>
       {edge.scrollable && (
         <div className={styles.head}>
           <div className={styles.nav}>
