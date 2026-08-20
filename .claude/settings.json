@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // \"\"'); case \"$f\" in */src/data/decks.json|*/src/data/generated.json|*/public/decks/*|*/public/decks-search.json|*/public/pdfjs/*) echo \"生成物なので直接編集しない。decks/ か scripts/build-decks.mjs / scripts/fetch-content.mjs を直して npm run decks か npm run fetch:content で作り直す\" >&2; exit 2;; esac",
+            "command": "f=$(jq -r '.tool_input.file_path // \"\"'); case \"$f\" in */src/data/decks.json|*/src/data/generated.json|*/public/decks/*|*/public/decks-search.json|*/public/pdfjs/*) echo \"生成物なので直接編集しない。decks/ か scripts/decks/ / scripts/fetch-content.mjs を直して npm run decks か npm run fetch:content で作り直す\" >&2; exit 2;; esac",
             "statusMessage": "生成物への編集を確認"
           }
         ]

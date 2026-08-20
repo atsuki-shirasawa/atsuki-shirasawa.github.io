@@ -31,21 +31,40 @@ node scripts/build-decks.mjs --force   # キャッシュを無視して全デッ
 | `.cache/decks.json` | 同上（フィンガープリント） | ignore |
 | `src/data/generated.json` | `scripts/fetch-content.mjs` | **コミット済み**（取得失敗時のフォールバック） |
 
-直すのは入力側 — `decks/<slug>/index.md`、`scripts/build-decks.mjs`、
-`scripts/fetch-content.mjs`、`src/data/profile.ts`（経歴・技術スタックは手動更新）。
+直すのは入力側 — `decks/<slug>/index.md`、`scripts/decks/`（`scripts/build-decks.mjs`
+は組み立てだけ）、`scripts/fetch-content.mjs`、`src/data/profile.ts`（経歴・技術
+スタックは手動更新）。
 
 ## デッキのビルドは「静かに古くなる」
 
-`scripts/build-decks.mjs` は `.cache/decks.json` にデッキディレクトリの
+`scripts/decks/cache.mjs` が `.cache/decks.json` にデッキディレクトリの
 フィンガープリント（バイト列の sha256）を持ち、一致すれば再生成を飛ばす。
 
-**出力の見た目・寸法・ファイル構成を変えたら `PIPELINE_VERSION` を上げる。**
-上げないと既存デッキは全部キャッシュに当たり、新しいコードが一度も走らない。
-`fingerprint()` は `PIPELINE_VERSION` / `POSTER_WIDTH` / `THUMB_WIDTH` をハッシュに
-混ぜているので、出力を左右するパラメータを増やしたらそこにも足す。
+**出力を左右する設定は `scripts/decks/config.mjs` の `OUTPUT_CONFIG` に置く。**
+`fingerprint()` はこのオブジェクトを丸ごとハッシュに混ぜるので、項目を足しても
+「混ぜ忘れて既存デッキが全部キャッシュに当たる」は起きない。逆に、ここに置かない
+値で出力が変わるようにすると、その変更は既存デッキに一度も届かない。
+
+**出力の作り方を変えたら `OUTPUT_CONFIG.version` を上げる。** 設定の値ではなく
+コード（sharp の呼び出し、pdf.js の描画、ファイル構成）を変えたときは、指紋が
+変わらないのでこれが唯一の無効化手段。
+
 mtime は混ぜない（git checkout が復元しないため CI で毎回ミスする）。
 
 パイプラインを触ったら `deck-pipeline-reviewer` サブエージェントでレビューする。
+
+### scripts/decks/ の分担
+
+| ファイル | 持ちもの |
+| --- | --- |
+| `config.mjs` | 出力先のパスと `OUTPUT_CONFIG`。`MARP_TMP_NAME` もここ |
+| `meta.mjs` | frontmatter の読み取りと正規化、4 形式の判定 |
+| `pdf.mjs` | Marp から書く / よそから落とす |
+| `render.mjs` | PDF から静止画と検索用テキストを起こす |
+| `cache.mjs` | 指紋と `.cache/decks.json` |
+| `record.mjs` | `decks.json` の 1 件（`toRecord`）と形の検査（`assertRecord`） |
+| `output.mjs` | `decks.json` / `decks-search.json` / `public/pdfjs/` の書き出しと後片付け |
+| `build-decks.mjs` | 組み立てだけ（`buildDeck` / `resolveDeck` / `main`） |
 
 ## 失敗しても止まらない設計
 
@@ -92,4 +111,18 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 - セミコロンなし、シングルクォート、2 スペース
 - CSS Modules（`Foo.tsx` に `Foo.module.css`）
 - コメントは日本語で **なぜそうしたか**を書く。何をしているかはコードが言う
-- `src/lib/` は React 非依存（`slideViewer.ts` は pdf.js を直接触る）
+- `src/lib/` は React 非依存（`slideViewer.ts` は pdf.js を直接触る）。
+  `src/hooks/` は振る舞い、`src/components/` は描画。集計や判定を `.tsx` に置かない
+
+置き場所が決まっているもの:
+
+| やりたいこと | 通す場所 |
+| --- | --- |
+| デッキの見せ方で分岐する | `src/lib/deckView.ts` の `DeckView`。`format === 'video'` を直に見ない |
+| デッキへのリンクを置く | `<DeckLink deck>`（外か中かを判断する） |
+| 外部リンクを置く | `<ExternalLink>`（`target` / `rel` を書かない） |
+| タグのチップを置く | `<DeckTags>`、または `global.css` の `.chip` |
+| ページ番号を丸める | `src/lib/page.ts` の `clampPage` / `parsePageParam` |
+| 現在年を読む | `src/lib/time.ts` の `currentYear`（`new Date()` を書かない） |
+| クエリを書き換える | `useQueryUpdate()`（常に `replace`） |
+| 静的ファイルの URL を作る | `src/lib/paths.ts` の `withBase()` |

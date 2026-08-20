@@ -48,7 +48,8 @@ npm run decks
   `decks/` を触っていないなら正常
 - `前回の内容で続行します` → remote PDF の取得に失敗。古い成果物が出ている
 - 出力の見た目を変えたのに反映されないときは
-  `scripts/build-decks.mjs` の `PIPELINE_VERSION` を上げるか `node scripts/build-decks.mjs --force`
+  `scripts/decks/config.mjs` の `OUTPUT_CONFIG.version` を上げるか
+  `node scripts/build-decks.mjs --force`
 
 ## 4. 生成物の鮮度を見る
 
