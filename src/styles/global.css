@@ -1,3 +1,6 @@
+@import 'tailwindcss';
+@import './theme.css';
+
 :root {
   --bg: #fafaf8;
   --surface: #ffffff;
@@ -32,11 +35,8 @@
   --heat-3: #3ba07f;
   --heat-4: #0f6e5c;
 
-  /* 名前・Slides の見出し・年間コントリビューションの 3 箇所だけに使う */
-  --font-display: 'Archivo', 'IBM Plex Sans JP', system-ui, sans-serif;
-  --font-sans: 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP',
-    sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* 書体は theme.css の @theme が持つ。--font-display は
+     名前・Slides の見出し・年間コントリビューションの 3 箇所だけに使う */
 
   --content-width: 960px;
   --content-pad: 32px;
@@ -84,6 +84,13 @@ body {
   margin: 0;
   padding: 0;
   background: var(--bg);
+  /*
+   * Tailwind の preflight は html に line-height: 1.5 を敷くが、この設計は
+   * 行送りを要る場所だけで指定している（1.4 / 1.65 / 1.7 / 1.85）。1.5 を
+   * 通すと、指定の無い 1 行ラベルが一斉に 3px 高くなる。既定へ戻して、
+   * 基準の行送りを持つかどうかは別に決める。
+   */
+  line-height: normal;
 }
 
 body {

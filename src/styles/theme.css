@@ -1,0 +1,99 @@
+/*
+ * Tailwind とこの設計の橋。
+ *
+ * 色は global.css の :root / html[data-theme='dark'] が持ち続ける。ここは
+ * @theme inline で「参照だけ」を渡すので、utility は var(--surface) を指したまま
+ * 出る。ダークモードは今までどおり data-theme の差し替えだけで効き、dark: を
+ * 書く場所は 1 つも増えない。コントラスト比の根拠コメントも定義の隣に残る。
+ *
+ * 尺度は逆で、Tailwind の既定を捨てて（--text-*: initial）この設計のものだけを
+ * 入れる。11〜15px の 1px 刻みで階層を作っているので、text-sm と text-body が
+ * 同義で並ぶ状態を残すと「どっちを書くか」がそのまま復活する。
+ *
+ * 値を足すときは、まずここに名前を付ける。utility に生の px を書かない。
+ */
+
+@theme {
+  /* Tailwind が持ってくる語彙を捨てる。red-500 や text-sm への逃げ道を作らない */
+  --color-*: initial;
+  --text-*: initial;
+  --breakpoint-*: initial;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line2: var(--line2);
+  --color-chipbg: var(--chipbg);
+  --color-chipfg: var(--chipfg);
+  --color-hoverbg: var(--hoverbg);
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent2);
+  --color-accent-fg: var(--accent-fg);
+  --color-zenn: var(--zenn);
+  --color-zenn-fg: var(--zenn-fg);
+  --color-qiita: var(--qiita);
+  --color-qiita-fg: var(--qiita-fg);
+}
+
+@theme {
+  /*
+   * 書体。data-theme で入れ替わらないので inline の橋には載せない
+   * （載せると --font-sans: var(--font-sans) という自己参照になる）。
+   * ここに置くと font-sans / font-mono / font-display の 3 つが生える。
+   */
+  --font-display: 'Archivo', 'IBM Plex Sans JP', system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP',
+    sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /*
+   * 文字の大きさ。名前は用途で付ける。11 と 12 の差を「xs と sm」と呼ぶと
+   * どちらを使うか決まらないが、「meta と note」なら決まる。
+   */
+  --text-meta: 11px; /* 年数・ページ番号など、本文に添える最小の値 */
+  --text-note: 12px; /* 日付・注記・フッター */
+  --text-label: 13px; /* ラベル、小さな見出し、説明文 */
+  --text-body: 14px; /* 本文 */
+  --text-lead: 15px; /* 本文より一段強い行。役職名やリード文 */
+
+  /* 行送り。本文系だけ名前を持たせる */
+  --leading-title: 1.65; /* 折り返す見出し */
+  --leading-prose: 1.7; /* 続けて読ませる文 */
+
+  /*
+   * 折り返し点。段組みを 1 列へ落とすところが 1 つあるだけで、
+   * Tailwind の sm/md/lg（640/768/1024）とはどれも一致しない。
+   */
+  --breakpoint-narrow: 45rem; /* 720px */
+}
+
+/*
+ * 意匠の primitive。同じ見た目が 3 箇所以上にあるものだけを置く。
+ * @utility なので hover: や max-narrow: が付く。
+ */
+
+/*
+ * CAREER / TECH STACK / WRITING に共通の「左に固定幅、右に中身」の行。
+ * 3 箇所で写されていて、揺れていたのは縦の padding とたたんだ後の gap だけ
+ * だった。骨格をここに置いて、違うぶんは使う側で足す。
+ */
+@utility section-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 24px;
+  border-bottom: 1px solid var(--line2);
+
+  /* 次の節の上罫線とすぐ並ぶので、最後の行では引かない */
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @media (width < 45rem) {
+    grid-template-columns: 1fr;
+  }
+}
