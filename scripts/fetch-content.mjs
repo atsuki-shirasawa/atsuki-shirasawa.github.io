@@ -29,6 +29,9 @@ function readPrevious() {
   }
 }
 
+/** 取れなかった項目は、コミット済みの値をそのまま残す */
+const keep = (fetched, previous, empty) => fetched ?? previous ?? empty
+
 async function getJson(url, headers = {}) {
   const res = await fetch(url, { headers: { 'user-agent': 'atsukish-portfolio', ...headers } })
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} — ${url}`)
@@ -59,32 +62,6 @@ function toIso(value) {
   return Number.isNaN(d.getTime()) ? '' : d.toISOString()
 }
 
-function decodeEntities(value) {
-  return value.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'")
-}
-
-/**
- * 記事ページの og:image を 1 件取り出す。サムネイルは無くても記事は出せるので、
- * 失敗しても null を返すだけにして取得全体は止めない。
- */
-async function fetchOgImage(url) {
-  try {
-    const res = await fetch(url, {
-      headers: { 'user-agent': 'Mozilla/5.0 (compatible; atsukish-portfolio)' },
-      signal: AbortSignal.timeout(10_000),
-    })
-    if (!res.ok) return null
-    const html = await res.text()
-    const hit =
-      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ??
-      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-    return hit ? decodeEntities(hit[1]) : null
-  } catch (e) {
-    warn(`og:image (${url}):`, e.message)
-    return null
-  }
-}
-
 async function fetchZennPosts() {
   const res = await fetch(`https://zenn.dev/${ZENN_USER}/feed`, {
     headers: { 'user-agent': 'atsukish-portfolio' },
@@ -99,8 +76,6 @@ async function fetchZennPosts() {
     title: String(item.title).trim(),
     site: 'Zenn',
     url: String(item.link).trim(),
-    // Zenn は RSS の enclosure に OGP 画像を載せてくれる
-    thumbnail: item.enclosure?.['@_url'] ?? null,
   }))
 }
 
@@ -108,15 +83,12 @@ async function fetchQiitaPosts() {
   const items = await getJson(
     `https://qiita.com/api/v2/users/${QIITA_USER}/items?per_page=${MAX_POSTS}`,
   )
-  // Qiita API はサムネイルを返さないので、記事ページの og:image を読みに行く
-  const thumbnails = await Promise.all(items.map((item) => fetchOgImage(item.url)))
-  return items.map((item, i) => ({
+  return items.map((item) => ({
     at: toIso(item.created_at),
     date: toYearMonth(item.created_at),
     title: String(item.title).trim(),
     site: 'Qiita',
     url: item.url,
-    thumbnail: thumbnails[i],
   }))
 }
 
@@ -124,17 +96,11 @@ async function fetchGitHubProfile() {
   const token = githubToken()
   const headers = token ? { authorization: `Bearer ${token}` } : {}
   const user = await getJson(`https://api.github.com/users/${GITHUB_USER}`, headers)
-  const repos = await getJson(
-    `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&type=owner&sort=updated`,
-    headers,
-  )
   return {
     login: user.login,
     // 表示は最大 64px なので 2x 相当を要求しておく
     avatarUrl: `${user.avatar_url}&s=240`,
     publicRepos: user.public_repos,
-    followers: user.followers,
-    stars: repos.reduce((sum, repo) => sum + (repo.stargazers_count ?? 0), 0),
   }
 }
 
@@ -193,6 +159,53 @@ async function fetchContributions() {
   return { totalContributions: calendar.totalContributions, weeks }
 }
 
+const isText = (value) => typeof value === 'string'
+const isCount = (value) => Number.isInteger(value) && value >= 0
+
+/**
+ * src/types.ts の GeneratedContent と対応する。TypeScript 側は `as` で信じている
+ * だけなので、書き出す前に形を確かめる。取得の失敗（外部要因）は前回の内容で凌ぐが、
+ * 形が合わないのはこちらのバグなので、静かに配らず落とす。
+ */
+function assertContent(content) {
+  const problems = []
+  const check = (ok, field) => {
+    if (!ok) problems.push(field)
+  }
+
+  check(isText(content.fetchedAt), 'fetchedAt')
+  check(
+    Array.isArray(content.posts) &&
+      content.posts.every(
+        (post) =>
+          isText(post.date) &&
+          isText(post.title) &&
+          isText(post.url) &&
+          (post.site === 'Zenn' || post.site === 'Qiita'),
+      ),
+    'posts',
+  )
+  check(isText(content.github?.login), 'github.login')
+  check(isText(content.github?.avatarUrl), 'github.avatarUrl')
+  check(isCount(content.github?.publicRepos), 'github.publicRepos')
+  check(isCount(content.github?.totalContributions), 'github.totalContributions')
+  check(
+    Array.isArray(content.github?.weeks) &&
+      content.github.weeks.every(
+        (week) =>
+          Array.isArray(week) &&
+          week.every(
+            (day) => day === null || (isText(day.d) && isCount(day.c) && day.l >= 0 && day.l <= 4),
+          ),
+      ),
+    'github.weeks',
+  )
+
+  if (problems.length > 0) {
+    throw new Error(`src/types.ts の GeneratedContent に合わない項目がある — ${problems.join(', ')}`)
+  }
+}
+
 async function main() {
   const prev = readPrevious()
 
@@ -203,12 +216,6 @@ async function main() {
     fetchContributions().catch((e) => (warn('GitHub contributions:', e.message), null)),
   ])
 
-  // 記事ページの og:image は 1 件ずつ失敗しうる（CI からの取得が弾かれるなど）。
-  // 前回取れていた URL はそのまま残し、サムネイルだけが欠けた状態で公開しない。
-  const knownThumbnails = new Map(
-    (prev?.posts ?? []).filter((p) => p.thumbnail).map((p) => [p.url, p.thumbnail]),
-  )
-
   let posts
   if (zenn || qiita) {
     posts = [...(zenn ?? []), ...(qiita ?? [])]
@@ -216,10 +223,7 @@ async function main() {
       .sort((a, b) => b.at.localeCompare(a.at))
       .slice(0, MAX_POSTS)
       // at は並べ替えにしか使わないので出力からは落とす
-      .map(({ at: _at, ...post }) => ({
-        ...post,
-        thumbnail: post.thumbnail ?? knownThumbnails.get(post.url) ?? null,
-      }))
+      .map(({ at: _at, ...post }) => post)
   } else {
     posts = prev?.posts ?? []
     warn('記事の取得に失敗したため既存データを維持します')
@@ -227,20 +231,17 @@ async function main() {
 
   const github = {
     login: GITHUB_USER,
-    avatarUrl: profile?.avatarUrl ?? prev?.github?.avatarUrl ?? '',
-    publicRepos: profile?.publicRepos ?? prev?.github?.publicRepos ?? 0,
-    followers: profile?.followers ?? prev?.github?.followers ?? 0,
-    stars: profile?.stars ?? prev?.github?.stars ?? 0,
-    totalContributions:
-      contributions?.totalContributions ?? prev?.github?.totalContributions ?? 0,
-    weeks: contributions?.weeks ?? prev?.github?.weeks ?? [],
+    avatarUrl: keep(profile?.avatarUrl, prev?.github?.avatarUrl, ''),
+    publicRepos: keep(profile?.publicRepos, prev?.github?.publicRepos, 0),
+    totalContributions: keep(contributions?.totalContributions, prev?.github?.totalContributions, 0),
+    weeks: keep(contributions?.weeks, prev?.github?.weeks, []),
   }
 
   const content = { fetchedAt: new Date().toISOString(), posts, github }
+  assertContent(content)
   writeFileSync(OUT, `${JSON.stringify(content, null, 2)}\n`)
-  const missing = posts.filter((p) => !p.thumbnail).length
   log(
-    `更新: 記事 ${posts.length} 件（サムネイル欠け ${missing} 件）/ repos ${github.publicRepos} / stars ${github.stars} / contributions ${github.totalContributions}`,
+    `更新: 記事 ${posts.length} 件 / repos ${github.publicRepos} / contributions ${github.totalContributions}`,
   )
 }
 

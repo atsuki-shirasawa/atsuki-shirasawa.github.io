@@ -22,8 +22,6 @@ export type Post = {
   title: string
   site: PostSite
   url: string
-  /** 記事の OGP 画像。取得できなかった記事は null */
-  thumbnail?: string | null
 }
 
 export type DeckLink = {
@@ -79,8 +77,6 @@ export type GitHubActivity = {
   /** プロフィール画像。取得できなかったときは空文字 */
   avatarUrl: string
   publicRepos: number
-  stars: number
-  followers: number
   totalContributions: number
   /** 直近 53 週ぶんを週ごと（各週は日曜〜土曜の 7 要素）に並べたもの */
   weeks: (ContributionDay | null)[][]

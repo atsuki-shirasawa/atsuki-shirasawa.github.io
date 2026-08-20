@@ -1,91 +1,78 @@
 {
-  "fetchedAt": "2026-08-20T01:12:56.890Z",
+  "fetchedAt": "2026-08-20T05:20:22.740Z",
   "posts": [
     {
       "date": "2025-12",
       "title": "AI エージェントに「道具」と「知恵」を。MCP と Agent Skills で描く次世代の標準化戦略",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/e080ae2847540d",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--1S20knnk--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:AI%2520%25E3%2582%25A8%25E3%2583%25BC%25E3%2582%25B8%25E3%2582%25A7%25E3%2583%25B3%25E3%2583%2588%25E3%2581%25AB%25E3%2580%258C%25E9%2581%2593%25E5%2585%25B7%25E3%2580%258D%25E3%2581%25A8%25E3%2580%258C%25E7%259F%25A5%25E6%2581%25B5%25E3%2580%258D%25E3%2582%2592%25E3%2580%2582MCP%2520%25E3%2581%25A8%2520Agent%2520Skills%2520%25E3%2581%25A7%25E6%258F%258F%25E3%2581%258F%25E6%25AC%25A1%25E4%25B8%2596%25E4%25BB%25A3%25E3%2581%25AE%25E6%25A8%2599%25E6%25BA%2596%25E5%258C%2596%25E6%2588%25A6%25E7%2595%25A5%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/e080ae2847540d"
     },
     {
       "date": "2025-12",
       "title": "Anthropic が示した「コード実行で 98.7% トークン削減」を安全に実装する",
       "site": "Qiita",
-      "url": "https://qiita.com/atsukish/items/82323b33f59d20db7200",
-      "thumbnail": "https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-user-contents.imgix.net%2Fhttps%253A%252F%252Fcdn.qiita.com%252Fassets%252Fpublic%252Fadvent-calendar-ogp-background-7940cd1c8db80a7ec40711d90f43539e.jpg%3Fixlib%3Drb-4.1.1%26w%3D1200%26blend64%3DaHR0cHM6Ly9xaWl0YS11c2VyLXByb2ZpbGUtaW1hZ2VzLmltZ2l4Lm5ldC9odHRwcyUzQSUyRiUyRnMzLWFwLW5vcnRoZWFzdC0xLmFtYXpvbmF3cy5jb20lMkZxaWl0YS1pbWFnZS1zdG9yZSUyRjAlMkY4NjYzMzglMkZjMTVmOTdhZWYzNGExZmFmZTg3NWUyMjBhNjk4NWFhYzlmYTJmMWQ2JTJGbGFyZ2UucG5nJTNGMTc3OTc2ODQyMD9peGxpYj1yYi00LjEuMSZhcj0xJTNBMSZmaXQ9Y3JvcCZtYXNrPWVsbGlwc2UmYmc9RkZGRkZGJmZtPXBuZzMyJnM9NjExNDhjNTAzZmI1YzY5NWViY2NmMmI1Yjc1NzNkZWI%26blend-x%3D120%26blend-y%3D467%26blend-w%3D82%26blend-h%3D82%26blend-mode%3Dnormal%26s%3Dc4d53ef8af5389423ba0d850fb4fae83?ixlib=rb-4.1.1&w=1200&fm=jpg&mark64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTk2MCZoPTMyNCZ0eHQ9QW50aHJvcGljJTIwJUUzJTgxJThDJUU3JUE0JUJBJUUzJTgxJTk3JUUzJTgxJTlGJUUzJTgwJThDJUUzJTgyJUIzJUUzJTgzJUJDJUUzJTgzJTg5JUU1JUFFJTlGJUU4JUExJThDJUUzJTgxJUE3JTIwOTguNyUyNSUyMCVFMyU4MyU4OCVFMyU4MyVCQyVFMyU4MiVBRiVFMyU4MyVCMyVFNSU4OSU4QSVFNiVCOCU5QiVFMyU4MCU4RCVFMyU4MiU5MiVFNSVBRSU4OSVFNSU4NSVBOCVFMyU4MSVBQiVFNSVBRSU5RiVFOCVBMyU4NSVFMyU4MSU5OSVFMyU4MiU4QiZ0eHQtYWxpZ249bGVmdCUyQ3RvcCZ0eHQtY29sb3I9JTIzM0EzQzNDJnR4dC1mb250PUhpcmFnaW5vJTIwU2FucyUyMFc2JnR4dC1zaXplPTU2JnR4dC1wYWQ9MCZzPTM1ZjhhODYwMTZiZDEyZjI4ODI5N2E4NDNkNDI4NjFk&mark-x=120&mark-y=112&blend64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTgzOCZoPTU4JnR4dD0lNDBhdHN1a2lzaCZ0eHQtY29sb3I9JTIzM0EzQzNDJnR4dC1mb250PUhpcmFnaW5vJTIwU2FucyUyMFc2JnR4dC1zaXplPTM2JnR4dC1wYWQ9MCZzPWNhYmQ3YzFjYTFmMzRlMTEzN2MxMzdhYzAxNjgyYTAx&blend-x=242&blend-y=480&blend-w=838&blend-h=46&blend-fit=crop&blend-crop=left%2Cbottom&blend-mode=normal&s=dec49909bd2ead210dfadd208b775df6"
+      "url": "https://qiita.com/atsukish/items/82323b33f59d20db7200"
     },
     {
       "date": "2025-08",
       "title": "【FastAPI-MCP】 既存の API を数行のコードで「LLM フレンドリー」にする方法",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/5ded6e7a29c86b",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--Tmg5eaRl--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:%25E3%2580%2590FastAPI-MCP%25E3%2580%2591%2520%25E6%2597%25A2%25E5%25AD%2598%25E3%2581%25AE%2520API%2520%25E3%2582%2592%25E6%2595%25B0%25E8%25A1%258C%25E3%2581%25AE%25E3%2582%25B3%25E3%2583%25BC%25E3%2583%2589%25E3%2581%25A7%25E3%2580%258CLLM%2520%25E3%2583%2595%25E3%2583%25AC%25E3%2583%25B3%25E3%2583%2589%25E3%2583%25AA%25E3%2583%25BC%25E3%2580%258D%25E3%2581%25AB%25E3%2581%2599%25E3%2582%258B%25E6%2596%25B9%25E6%25B3%2595%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/5ded6e7a29c86b"
     },
     {
       "date": "2025-04",
       "title": "MCP の Quickstart を HTTP+SSE で実装してみる",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/e4e1009ab19c3c",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--74sEQpdg--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:MCP%2520%25E3%2581%25AE%2520Quickstart%2520%25E3%2582%2592%2520HTTP%252BSSE%2520%25E3%2581%25A7%25E5%25AE%259F%25E8%25A3%2585%25E3%2581%2597%25E3%2581%25A6%25E3%2581%25BF%25E3%2582%258B%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/e4e1009ab19c3c"
     },
     {
       "date": "2025-02",
       "title": "Arize Phoenix v8.0 新機能：プロンプトテンプレートの基本と LangChain アプリケーションへの応用",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/8af489797a4bd6",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--2M3pKKlF--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:Arize%2520Phoenix%2520v8.0%2520%25E6%2596%25B0%25E6%25A9%259F%25E8%2583%25BD%25EF%25BC%259A%25E3%2583%2597%25E3%2583%25AD%25E3%2583%25B3%25E3%2583%2597%25E3%2583%2588%25E3%2583%2586%25E3%2583%25B3%25E3%2583%2597%25E3%2583%25AC%25E3%2583%25BC%25E3%2583%2588%25E3%2581%25AE%25E5%259F%25BA%25E6%259C%25AC%25E3%2581%25A8%2520LangChain%2520%25E3%2582%25A2%25E3%2583%2597%25E3%2583%25AA%25E3%2582%25B1%25E3%2583%25BC%25E3%2582%25B7%25E3%2583%25A7%25E3%2583%25B3...%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/8af489797a4bd6"
     },
     {
       "date": "2025-01",
       "title": "PydanticAI の新機能：pydantic-graph で AI エージェントのワークフローを作る",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/8169318b02e39c",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--jeHXGeqk--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:PydanticAI%2520%25E3%2581%25AE%25E6%2596%25B0%25E6%25A9%259F%25E8%2583%25BD%25EF%25BC%259Apydantic-graph%2520%25E3%2581%25A7%2520AI%2520%25E3%2582%25A8%25E3%2583%25BC%25E3%2582%25B8%25E3%2582%25A7%25E3%2583%25B3%25E3%2583%2588%25E3%2581%25AE%25E3%2583%25AF%25E3%2583%25BC%25E3%2582%25AF%25E3%2583%2595%25E3%2583%25AD%25E3%2583%25BC%25E3%2582%2592%25E4%25BD%259C%25E3%2582%258B%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/8169318b02e39c"
     },
     {
       "date": "2025-01",
       "title": "uv で Artifact Registry の Python パッケージをデプロイする",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/9d32eb2d6f493f",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--nj_YElAB--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:uv%2520%25E3%2581%25A7%2520Artifact%2520Registry%2520%25E3%2581%25AE%2520Python%2520%25E3%2583%2591%25E3%2583%2583%25E3%2582%25B1%25E3%2583%25BC%25E3%2582%25B8%25E3%2582%2592%25E3%2583%2587%25E3%2583%2597%25E3%2583%25AD%25E3%2582%25A4%25E3%2581%2599%25E3%2582%258B%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/9d32eb2d6f493f"
     },
     {
       "date": "2025-01",
       "title": "Poetry v2.0 リリース後の Docker 環境を救う簡単な暫定対処法",
       "site": "Zenn",
-      "url": "https://zenn.dev/atsukish/articles/bdb235c7466e42",
-      "thumbnail": "https://res.cloudinary.com/zenn/image/upload/s--BmGQ0IRL--/c_fit%2Cg_north_west%2Cl_text:notosansjp-medium.otf_55:Poetry%2520v2.0%2520%25E3%2583%25AA%25E3%2583%25AA%25E3%2583%25BC%25E3%2582%25B9%25E5%25BE%258C%25E3%2581%25AE%2520Docker%2520%25E7%2592%25B0%25E5%25A2%2583%25E3%2582%2592%25E6%2595%2591%25E3%2581%2586%25E7%25B0%25A1%25E5%258D%2598%25E3%2581%25AA%25E6%259A%25AB%25E5%25AE%259A%25E5%25AF%25BE%25E5%2587%25A6%25E6%25B3%2595%2Cw_1010%2Cx_90%2Cy_100/g_south_west%2Cl_text:notosansjp-medium.otf_37:atsukish%2Cx_203%2Cy_121/g_south_west%2Ch_90%2Cl_fetch:aHR0cHM6Ly9zdGF0aWMuemVubi5zdHVkaW8vdXNlci11cGxvYWQvYXZhdGFyL2Y3YWQ4MThjNTcuanBlZw==%2Cr_max%2Cw_90%2Cx_87%2Cy_95/v1627283836/default/og-base-w1200-v2.png?_a=BACMTiAE"
+      "url": "https://zenn.dev/atsukish/articles/bdb235c7466e42"
     },
     {
       "date": "2024-12",
       "title": "PydanticのLLMエージェントフレームワーク「PydanticAI」を使ってみた",
       "site": "Qiita",
-      "url": "https://qiita.com/atsukish/items/a1613c77cecd41980467",
-      "thumbnail": "https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-user-contents.imgix.net%2Fhttps%253A%252F%252Fcdn.qiita.com%252Fassets%252Fpublic%252Fadvent-calendar-ogp-background-7940cd1c8db80a7ec40711d90f43539e.jpg%3Fixlib%3Drb-4.1.1%26w%3D1200%26blend64%3DaHR0cHM6Ly9xaWl0YS11c2VyLXByb2ZpbGUtaW1hZ2VzLmltZ2l4Lm5ldC9odHRwcyUzQSUyRiUyRnMzLWFwLW5vcnRoZWFzdC0xLmFtYXpvbmF3cy5jb20lMkZxaWl0YS1pbWFnZS1zdG9yZSUyRjAlMkY4NjYzMzglMkZjMTVmOTdhZWYzNGExZmFmZTg3NWUyMjBhNjk4NWFhYzlmYTJmMWQ2JTJGbGFyZ2UucG5nJTNGMTc3OTc2ODQyMD9peGxpYj1yYi00LjEuMSZhcj0xJTNBMSZmaXQ9Y3JvcCZtYXNrPWVsbGlwc2UmYmc9RkZGRkZGJmZtPXBuZzMyJnM9NjExNDhjNTAzZmI1YzY5NWViY2NmMmI1Yjc1NzNkZWI%26blend-x%3D120%26blend-y%3D467%26blend-w%3D82%26blend-h%3D82%26blend-mode%3Dnormal%26s%3Dc4d53ef8af5389423ba0d850fb4fae83?ixlib=rb-4.1.1&w=1200&fm=jpg&mark64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTk2MCZoPTMyNCZ0eHQ9UHlkYW50aWMlRTMlODElQUVMTE0lRTMlODIlQTglRTMlODMlQkMlRTMlODIlQjglRTMlODIlQTclRTMlODMlQjMlRTMlODMlODglRTMlODMlOTUlRTMlODMlQUMlRTMlODMlQkMlRTMlODMlQTAlRTMlODMlQUYlRTMlODMlQkMlRTMlODIlQUYlRTMlODAlOENQeWRhbnRpY0FJJUUzJTgwJThEJUUzJTgyJTkyJUU0JUJEJUJGJUUzJTgxJUEzJUUzJTgxJUE2JUUzJTgxJUJGJUUzJTgxJTlGJnR4dC1hbGlnbj1sZWZ0JTJDdG9wJnR4dC1jb2xvcj0lMjMzQTNDM0MmdHh0LWZvbnQ9SGlyYWdpbm8lMjBTYW5zJTIwVzYmdHh0LXNpemU9NTYmdHh0LXBhZD0wJnM9NGRmYWMwZDU4ODIzYjRkZjk1MWZjNmFiYWU5NzJmZDg&mark-x=120&mark-y=112&blend64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTgzOCZoPTU4JnR4dD0lNDBhdHN1a2lzaCZ0eHQtY29sb3I9JTIzM0EzQzNDJnR4dC1mb250PUhpcmFnaW5vJTIwU2FucyUyMFc2JnR4dC1zaXplPTM2JnR4dC1wYWQ9MCZzPWNhYmQ3YzFjYTFmMzRlMTEzN2MxMzdhYzAxNjgyYTAx&blend-x=242&blend-y=480&blend-w=838&blend-h=46&blend-fit=crop&blend-crop=left%2Cbottom&blend-mode=normal&s=98635772c6737c6cdab25d58eb1c94aa"
+      "url": "https://qiita.com/atsukish/items/a1613c77cecd41980467"
     },
     {
       "date": "2023-12",
       "title": "画像生成 AI で生成した画像は CNN で判別できる？",
       "site": "Qiita",
-      "url": "https://qiita.com/atsukish/items/e152b6ebbe6b2c58ce0a",
-      "thumbnail": "https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-user-contents.imgix.net%2Fhttps%253A%252F%252Fcdn.qiita.com%252Fassets%252Fpublic%252Fadvent-calendar-ogp-background-7940cd1c8db80a7ec40711d90f43539e.jpg%3Fixlib%3Drb-4.1.1%26w%3D1200%26blend64%3DaHR0cHM6Ly9xaWl0YS11c2VyLXByb2ZpbGUtaW1hZ2VzLmltZ2l4Lm5ldC9odHRwcyUzQSUyRiUyRnMzLWFwLW5vcnRoZWFzdC0xLmFtYXpvbmF3cy5jb20lMkZxaWl0YS1pbWFnZS1zdG9yZSUyRjAlMkY4NjYzMzglMkZjMTVmOTdhZWYzNGExZmFmZTg3NWUyMjBhNjk4NWFhYzlmYTJmMWQ2JTJGbGFyZ2UucG5nJTNGMTc3OTc2ODQyMD9peGxpYj1yYi00LjEuMSZhcj0xJTNBMSZmaXQ9Y3JvcCZtYXNrPWVsbGlwc2UmYmc9RkZGRkZGJmZtPXBuZzMyJnM9NjExNDhjNTAzZmI1YzY5NWViY2NmMmI1Yjc1NzNkZWI%26blend-x%3D120%26blend-y%3D467%26blend-w%3D82%26blend-h%3D82%26blend-mode%3Dnormal%26s%3Dc4d53ef8af5389423ba0d850fb4fae83?ixlib=rb-4.1.1&w=1200&fm=jpg&mark64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTk2MCZoPTMyNCZ0eHQ9JUU3JTk0JUJCJUU1JTgzJThGJUU3JTk0JTlGJUU2JTg4JTkwJTIwQUklMjAlRTMlODElQTclRTclOTQlOUYlRTYlODglOTAlRTMlODElOTclRTMlODElOUYlRTclOTQlQkIlRTUlODMlOEYlRTMlODElQUYlMjBDTk4lMjAlRTMlODElQTclRTUlODglQTQlRTUlODglQTUlRTMlODElQTclRTMlODElOEQlRTMlODIlOEIlRUYlQkMlOUYmdHh0LWFsaWduPWxlZnQlMkN0b3AmdHh0LWNvbG9yPSUyMzNBM0MzQyZ0eHQtZm9udD1IaXJhZ2lubyUyMFNhbnMlMjBXNiZ0eHQtc2l6ZT01NiZ0eHQtcGFkPTAmcz04OGUyMDYwNGVjOTY3YWYzMTc5ODdjNzY5ZjE1MzYxZA&mark-x=120&mark-y=112&blend64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTgzOCZoPTU4JnR4dD0lNDBhdHN1a2lzaCZ0eHQtY29sb3I9JTIzM0EzQzNDJnR4dC1mb250PUhpcmFnaW5vJTIwU2FucyUyMFc2JnR4dC1zaXplPTM2JnR4dC1wYWQ9MCZzPWNhYmQ3YzFjYTFmMzRlMTEzN2MxMzdhYzAxNjgyYTAx&blend-x=242&blend-y=480&blend-w=838&blend-h=46&blend-fit=crop&blend-crop=left%2Cbottom&blend-mode=normal&s=d0328985cd037680df81e56671ed9344"
+      "url": "https://qiita.com/atsukish/items/e152b6ebbe6b2c58ce0a"
     },
     {
       "date": "2022-12",
       "title": "【MLOps】Vertex AIによるモデルモニタリングサービスの構築",
       "site": "Qiita",
-      "url": "https://qiita.com/atsukish/items/63ed4415a67bfaaef220",
-      "thumbnail": "https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-user-contents.imgix.net%2Fhttps%253A%252F%252Fcdn.qiita.com%252Fassets%252Fpublic%252Fadvent-calendar-ogp-background-7940cd1c8db80a7ec40711d90f43539e.jpg%3Fixlib%3Drb-4.1.1%26w%3D1200%26blend64%3DaHR0cHM6Ly9xaWl0YS11c2VyLXByb2ZpbGUtaW1hZ2VzLmltZ2l4Lm5ldC9odHRwcyUzQSUyRiUyRnMzLWFwLW5vcnRoZWFzdC0xLmFtYXpvbmF3cy5jb20lMkZxaWl0YS1pbWFnZS1zdG9yZSUyRjAlMkY4NjYzMzglMkZjMTVmOTdhZWYzNGExZmFmZTg3NWUyMjBhNjk4NWFhYzlmYTJmMWQ2JTJGbGFyZ2UucG5nJTNGMTc3OTc2ODQyMD9peGxpYj1yYi00LjEuMSZhcj0xJTNBMSZmaXQ9Y3JvcCZtYXNrPWVsbGlwc2UmYmc9RkZGRkZGJmZtPXBuZzMyJnM9NjExNDhjNTAzZmI1YzY5NWViY2NmMmI1Yjc1NzNkZWI%26blend-x%3D120%26blend-y%3D467%26blend-w%3D82%26blend-h%3D82%26blend-mode%3Dnormal%26s%3Dc4d53ef8af5389423ba0d850fb4fae83?ixlib=rb-4.1.1&w=1200&fm=jpg&mark64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTk2MCZoPTMyNCZ0eHQ9JUUzJTgwJTkwTUxPcHMlRTMlODAlOTFWZXJ0ZXglMjBBSSVFMyU4MSVBQiVFMyU4MiU4OCVFMyU4MiU4QiVFMyU4MyVBMiVFMyU4MyU4NyVFMyU4MyVBQiVFMyU4MyVBMiVFMyU4MyU4QiVFMyU4MiVCRiVFMyU4MyVBQSVFMyU4MyVCMyVFMyU4MiVCMCVFMyU4MiVCNSVFMyU4MyVCQyVFMyU4MyU5MyVFMyU4MiVCOSVFMyU4MSVBRSVFNiVBNyU4QiVFNyVBRiU4OSZ0eHQtYWxpZ249bGVmdCUyQ3RvcCZ0eHQtY29sb3I9JTIzM0EzQzNDJnR4dC1mb250PUhpcmFnaW5vJTIwU2FucyUyMFc2JnR4dC1zaXplPTU2JnR4dC1wYWQ9MCZzPTA0NzI2NzVkZmIyNzUwMTM4MjM4ZDA2ZjRlOTkzMTMy&mark-x=120&mark-y=112&blend64=aHR0cHM6Ly9xaWl0YS11c2VyLWNvbnRlbnRzLmltZ2l4Lm5ldC9-dGV4dD9peGxpYj1yYi00LjEuMSZ3PTgzOCZoPTU4JnR4dD0lNDBhdHN1a2lzaCZ0eHQtY29sb3I9JTIzM0EzQzNDJnR4dC1mb250PUhpcmFnaW5vJTIwU2FucyUyMFc2JnR4dC1zaXplPTM2JnR4dC1wYWQ9MCZzPWNhYmQ3YzFjYTFmMzRlMTEzN2MxMzdhYzAxNjgyYTAx&blend-x=242&blend-y=480&blend-w=838&blend-h=46&blend-fit=crop&blend-crop=left%2Cbottom&blend-mode=normal&s=950e570baf4e586df180f58129e2bed3"
+      "url": "https://qiita.com/atsukish/items/63ed4415a67bfaaef220"
     }
   ],
   "github": {
     "login": "atsuki-shirasawa",
     "avatarUrl": "https://avatars.githubusercontent.com/u/108639914?v=4&s=240",
-    "publicRepos": 15,
-    "followers": 0,
-    "stars": 1,
-    "totalContributions": 3950,
+    "publicRepos": 16,
+    "totalContributions": 3964,
     "weeks": [
       [
         {
@@ -2034,8 +2021,8 @@
         },
         {
           "d": "2026-08-20",
-          "c": 7,
-          "l": 1
+          "c": 21,
+          "l": 2
         },
         null,
         null
