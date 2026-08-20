@@ -1,9 +1,5 @@
 <!-- @format -->
 
-## Stats
-
-![](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=atsuki-shirasawa&theme=gruvbox)
-
 ## Portfolio
 
 React + Vite で作ったポートフォリオサイトを GitHub Pages で公開しています。
