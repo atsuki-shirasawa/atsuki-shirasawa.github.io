@@ -104,6 +104,36 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
   プロジェクトサイトへ移したとき（`BASE_PATH=/<repo>/`）に壊れる
 - ルーティングはハッシュ（`/#/slides/<slug>`）。Pages に SPA フォールバックが無いため
 
+## 依存関係
+
+`npm audit fix --force` を**使わない**。marp-cli の周りで往復するだけになる。
+
+| marp-cli | 出る脆弱性 | npm が言う fix |
+| --- | --- | --- |
+| 4.5.0 | `extract-zip`（high 4 件） | 2.4.0 にしろ |
+| 2.4.0 | `tar-fs` 3 件 + `ws` 3 件（計 9 件） | 4.5.0 にしろ |
+
+どちらも「fix available」と出るので、`--force` を 2 回叩くと元に戻る。実際に一度
+2.4.0 まで落ちていた（9 件のほうが悪い）。
+
+**正解は上流で連鎖を切ること。** `package.json` の `overrides` で
+`puppeteer-core` を `^25.8.0` に上げてある。理由:
+
+- 連鎖は `marp-cli → puppeteer-core → @puppeteer/browsers → extract-zip`
+- `extract-zip` に修正版は無い（advisory は `*`）。`@puppeteer/browsers@3.x` が
+  依存ごと捨てている（いまは `yargs` と `modern-tar` だけ）
+- marp-cli 4.5.0 は `puppeteer-core@^24` を要求するが、24 系が引くのは
+  `@puppeteer/browsers@2.13.2` で、こちらは `extract-zip` を持つ
+- `@puppeteer/browsers` を直接 3.x に上げる手もあるが、puppeteer-core は
+  そこから 13 個のシンボルを使っていて面が広い。marp-cli が puppeteer-core に
+  求めるのは起動と PDF 出力だけなので、**上げるなら puppeteer-core 側**。
+  25.8.0 は `@puppeteer/browsers@3.2.1` をピン留めしていて、組で出ている版
+
+override を触ったら **Marp デッキが焼けるかを実際に確かめる**（型検査もビルドも
+marp-cli を通らないので、壊れても緑になる）。`decks/_examples/marp-deck` を
+コピーして `node scripts/build-decks.mjs --force`。見るのは PDF のバイト数だけでは
+足りない — 表紙 `p-1.webp` の標準偏差が 0 なら単色、つまり描画に失敗している。
+
 ## CSS の置き方
 
 Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル単位で分ける** —
