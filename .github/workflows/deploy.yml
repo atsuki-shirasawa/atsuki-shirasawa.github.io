@@ -40,12 +40,18 @@ jobs:
             .cache
             public/decks
             public/pdfjs
-          # 出力を作るコードも鍵に混ぜる。パイプラインは scripts/decks/ に
-          # 分かれていて build-decks.mjs は組み立てだけなので、そちらを外すと
-          # 「レンダリングを直したのに CI では前の絵が復元される」が起きる。
-          # OUTPUT_CONFIG.version を上げ忘れても、ここで空振りして作り直せる
-          key: decks-${{ hashFiles('decks/**', 'scripts/build-decks.mjs', 'scripts/decks/**') }}
-          restore-keys: decks-
+          # 鍵を 2 段にする。前が出力を作るコード、後ろがデッキの中身。
+          #
+          # restore-keys は前方一致なので、コードのハッシュを接頭辞に置かないと
+          # 意味がない — 厳密鍵を空振りさせても decks- で古いものが復元され、
+          # 指紋（OUTPUT_CONFIG しか見ない）が「変わっていない」と言ってしまう。
+          # 接頭辞に入れておけば、レンダリングを直した回は前の絵を拾えず、
+          # OUTPUT_CONFIG.version を上げ忘れても作り直しになる。
+          #
+          # デッキを 1 本足しただけの回は接頭辞が同じなので、後ろの空振りを
+          # restore-keys が受けて、変わっていないデッキはそのまま使える
+          key: decks-${{ hashFiles('scripts/build-decks.mjs', 'scripts/decks/**') }}-${{ hashFiles('decks/**') }}
+          restore-keys: decks-${{ hashFiles('scripts/build-decks.mjs', 'scripts/decks/**') }}-
 
       - name: Fetch content and build
         env:
