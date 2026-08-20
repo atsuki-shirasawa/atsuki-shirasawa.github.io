@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // \"\"'); case \"$f\" in */src/data/decks.json|*/src/data/generated.json|*/public/decks/*|*/public/decks-search.json|*/public/pdfjs/*) echo \"生成物なので直接編集しない。decks/ か scripts/build-decks.mjs / scripts/fetch-content.mjs を直して npm run decks か npm run fetch:content で作り直す\" >&2; exit 2;; esac",
+            "statusMessage": "生成物への編集を確認"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // \"\"'); case \"$f\" in *.ts|*.tsx) out=$(npm run --silent typecheck 2>&1) || { printf \"%s\\n\" \"$out\" | tail -30 >&2; exit 2; };; esac",
+            "timeout": 120,
+            "statusMessage": "tsc -b で型チェック"
+          }
+        ]
+      }
+    ]
+  }
+}
