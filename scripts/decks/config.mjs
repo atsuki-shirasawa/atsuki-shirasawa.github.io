@@ -4,7 +4,19 @@ import { fileURLToPath } from 'node:url'
 
 export const root = fileURLToPath(new URL('../..', import.meta.url))
 
-export const DECKS_DIR = path.join(root, 'decks')
+/**
+ * 読むデッキの置き場所。既定は decks/。
+ *
+ * CI の検証ジョブが DECKS_DIR=decks/_examples を渡して見本だけを焼く。公開デッキは
+ * よそでホストされている PDF 1 本しか無く、Marp と手元の PDF の経路は decks/ に
+ * 自前のスライドが入るまで一度も通らないため（そこに 3 件のバグが溜まっていた）。
+ * 見本を指すぶんには findDecks の `_` 読み飛ばしに触らずに済む — 読み飛ばされるのは
+ * decks/_examples 自身で、その中の marp-deck / pdf-deck / video-deck ではない。
+ *
+ * 注意: キャッシュの鍵は slug だけなので、両方の置き場所に同じ slug があると
+ * 取り違える。検証ジョブは前の成果物を復元しない前提で走らせる。
+ */
+export const DECKS_DIR = path.resolve(root, process.env.DECKS_DIR ?? 'decks')
 export const OUT_DIR = path.join(root, 'public', 'decks')
 export const PDFJS_OUT_DIR = path.join(root, 'public', 'pdfjs')
 export const GEN_FILE = path.join(root, 'src', 'data', 'decks.json')

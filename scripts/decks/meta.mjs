@@ -1,5 +1,9 @@
 // decks/<slug>/index.md の frontmatter を読み、以降が扱う形に正規化する。
 // 「どの形式のデッキか」の判定もここ（src/lib/deckView.ts の DeckView に対応する）。
+//
+// 下の normalize* は readMeta の部品だが export してある。人が手で書く YAML が
+// 入力なので受け口が広く（日付は Date でも文字列でも、links は配列でも表でも来る）、
+// 分岐が readMeta 経由でしか触れないと試せない。meta.test.mjs が直接呼ぶ。
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -71,7 +75,7 @@ export async function readMeta({ slug, dir, indexPath }) {
 }
 
 /** Even when YAML hands back a Date, return YYYY-MM-DD in UTC so the day never shifts */
-function normalizeDate(value) {
+export function normalizeDate(value) {
   if (!value) return null
   if (value instanceof Date) return value.toISOString().slice(0, 10)
   const text = String(value).trim()
@@ -81,7 +85,7 @@ function normalizeDate(value) {
   return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
 }
 
-function normalizeTags(value) {
+export function normalizeTags(value) {
   if (!value) return []
   const list = Array.isArray(value) ? value : String(value).split(',')
   const seen = new Set()
@@ -100,7 +104,7 @@ function normalizeTags(value) {
  * watch / youtu.be / embed / live のどれでも受け、開始位置（90, 90s, 1m30s）も拾う。
  * YouTube 以外は今のところ扱わない。
  */
-function normalizeVideo(value) {
+export function normalizeVideo(value) {
   if (!value) return null
   const raw = String(typeof value === 'object' ? (value.url ?? '') : value).trim()
   if (!raw) return null
@@ -129,7 +133,7 @@ function normalizeVideo(value) {
 }
 
 /** 90 / 90s / 1m30s / 1h2m3s を秒に */
-function parseStart(value) {
+export function parseStart(value) {
   if (!value) return 0
   const text = String(value).trim()
   if (/^\d+$/.test(text)) return Number(text)
@@ -140,7 +144,7 @@ function parseStart(value) {
 }
 
 /** Accepts links: [{label, url}] or {label: url} */
-function normalizeLinks(value) {
+export function normalizeLinks(value) {
   if (!value) return []
   if (Array.isArray(value)) {
     return value

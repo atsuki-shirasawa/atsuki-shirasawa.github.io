@@ -19,15 +19,21 @@ export type CareerLeg = {
   isEarliest: boolean
 }
 
-/** CAREER のレーン。profile.ts の並び（新しい順）のまま、上端が現在になる */
-export function careerLegs(): CareerLeg[] {
-  return career.map((entry, index) => ({
+/**
+ * CAREER のレーン。profile.ts の並び（新しい順）のまま、上端が現在になる。
+ *
+ * entries を受け取れるのはテストのため。既定引数なので呼ぶ側は変わらないが、
+ * これが無いと「同じ年に区間が 2 つある」「現職の開始年が現在年」のような、
+ * 実データには無い並びを試せない（そこで一度 key を衝突させた）。
+ */
+export function careerLegs(entries: CareerEntry[] = career): CareerLeg[] {
+  return entries.map((entry, index) => ({
     entry,
     period: `${entry.from} — ${entry.to ?? 'Present'}`,
     years: (entry.to ?? currentYear) - entry.from,
-    showOrg: Boolean(entry.org) && entry.org !== career[index - 1]?.org,
+    showOrg: Boolean(entry.org) && entry.org !== entries[index - 1]?.org,
     isCurrent: entry.to === null,
-    isEarliest: index === career.length - 1,
+    isEarliest: index === entries.length - 1,
   }))
 }
 
@@ -46,9 +52,9 @@ export type CareerTrack = {
   at(year: number): number
 }
 
-/** Hero のトラック。古い順に並べ直して左から右へ引く */
-export function careerTrack(): CareerTrack {
-  const ordered = [...career].sort((a, b) => a.from - b.from)
+/** Hero のトラック。古い順に並べ直して左から右へ引く（entries は careerLegs と同じ理由） */
+export function careerTrack(entries: CareerEntry[] = career): CareerTrack {
+  const ordered = [...entries].sort((a, b) => a.from - b.from)
   const end = currentYear
   // career が空でも落とさない。1 点だけのトラックとして退化させる
   const start = ordered[0]?.from ?? end

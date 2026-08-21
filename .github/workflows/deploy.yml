@@ -67,8 +67,32 @@ jobs:
         with:
           path: dist
 
+  # 公開デッキはよそでホストされている PDF 1 本だけなので、Marp と「手元の PDF」の
+  # 経路は本番ビルドで一度も通らない（表紙の生成・全文検索テキストの抽出も含めて）。
+  # decks/_examples の見本を毎回ほんとうに焼いて、出力の中身まで確かめる。
+  #
+  # デッキのキャッシュは復元しない。ここは速さより「毎回描かせること」が目的。
+  # DECKS_DIR で見本だけを指すので、よそへ PDF を取りに行かず、ネットワークの
+  # 都合でデプロイが止まることもない。
+  verify-decks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Marp の PDF 化に Chrome が要る。ubuntu-latest の image は
+      # /usr/bin/google-chrome を持っていて scripts/decks/pdf.mjs の findChrome() が
+      # 拾う。image から消えたら CHROME_PATH を渡す
+      - run: npm run decks:examples
+
   deploy:
-    needs: build
+    needs: [build, verify-decks]
     runs-on: ubuntu-latest
     environment:
       name: github-pages

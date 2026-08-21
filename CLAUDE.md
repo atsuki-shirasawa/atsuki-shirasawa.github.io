@@ -1,8 +1,10 @@
 # atsukish-portfolio
 
 React 19 + Vite 8 + TypeScript の静的ポートフォリオ。GitHub Pages のユーザーサイト
-（https://atsuki-shirasawa.github.io/）に配信している。テストは無い。
-品質の門は **`biome lint` と `tsc -b`** の 2 枚（どちらも `npm run build` が通る）。
+（https://atsuki-shirasawa.github.io/）に配信している。
+品質の門は **`biome lint` と `tsc -b` と `vitest run`** の 3 枚（すべて `npm run build`
+が通る）。テストが見るのは `src/lib/` と `scripts/decks/meta.mjs` の純関数だけで、
+コンポーネントの描画は見ない（下記）。
 
 ## コマンド
 
@@ -12,13 +14,19 @@ npm run decks          # decks/ を正規化（Marp → PDF → ページ画像 
 npm run fetch:content  # Zenn / Qiita / GitHub を取り直して src/data/generated.json を更新
 npm run lint           # biome lint
 npm run typecheck      # tsc -b --noEmit
-npm run build          # decks + fetch:content + biome lint + tsc -b + vite build
-npm run build:only     # 外部取得を飛ばして lint・型チェック・vite build のみ
+npm test               # vitest run
+npm run decks:examples # decks/_examples の 3 形式を実際に焼いて出力を検査
+npm run build          # decks + fetch:content + lint + tsc -b + vitest + vite build
+npm run build:only     # 外部取得を飛ばして lint・型チェック・test・vite build のみ
 
 node scripts/build-decks.mjs --force   # キャッシュを無視して全デッキ再生成
+npx vitest                             # 監視モード
 ```
 
-## 検査の 2 枚
+`decks:examples` は `src/data/decks.json` と `public/decks/` を見本の内容で上書きする。
+使ったあとは `npm run decks` で戻す（どちらも生成物なのでコミットには影響しない）。
+
+## 検査の 3 枚
 
 **`tsc -b`（`src/` だけ）。** `noUncheckedIndexedAccess` を入れてある。添字と
 `Map.get` に `undefined` が付くので、`src/lib/` の集計は「空でも落ちない」形で
@@ -39,6 +47,28 @@ node scripts/build-decks.mjs --force   # キャッシュを無視して全デッ
 - `typescript-eslint` は使えない。peer が `typescript <6.1.0` で、このリポジトリは
   7 系。パーサが実行時に停止する（`typescript-eslint#10940`）。biome は独自パーサ
   なので影響を受けず、`.tsx` の `useExhaustiveDependencies` まで見られる
+
+**`vitest run`（設定ファイルなし）。** `vite.config.ts` をそのまま読むので
+`vitest.config.ts` は置いていない。テストは対象の隣（`src/lib/*.test.ts`、
+`scripts/decks/meta.test.mjs`）。`src/` に置いたぶんは **`tsc -b` と biome の網にも
+入る**ので、テスト自身の型崩れとルール違反もそこで止まる。
+
+見るのは**入力と出力だけの関数**に絞る。DOM も React も要らず、速い（73 件で 0.2 秒）。
+
+- `src/lib/`: `career` `contributions` `page` `deckView` `lang`
+- `scripts/decks/meta.mjs`: `normalizeDate` / `normalizeTags` / `normalizeVideo` /
+  `parseStart` / `normalizeLinks`。`readMeta` の部品だが、入力が人の書く YAML で
+  受け口が広いので export してある（`readMeta` 経由では分岐をほとんど通せない）
+
+**コンポーネントの描画テストは入れない。** 費用対効果が合わないうえ、このリポジトリで
+実際に壊れてきたのは描画ではなく pdf.js との境界と副作用の順序で、そこは jsdom では
+再現しない。代わりが下の 2 つ — `npm run decks:examples`（出力の中身を見る）と、
+自前のスライドを足した回にブラウザで開くこと。
+
+**`careerLegs` / `careerTrack` は `entries` を受け取れる**（既定引数なので呼ぶ側は
+変わらない）。実データには無い並び — 同じ年に区間が 2 つ、現職の開始年が現在年 — を
+試すため。ここを注入できなかったせいで、目盛りの年が重複して React の key が衝突する
+のを長く見落としていた。`src/lib/` に判定を足すときは、同じように渡せる形にする。
 
 ## 生成物は直接編集しない
 
@@ -133,15 +163,28 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 
 `src/lib/slideViewer.ts` と `SlideViewer.module.css` で 770 行あまり、コードの
 15% ほどがそこにある。型検査もビルドもここを通るが、どちらも「動くか」は見ない。
-実際、この 3 つは全部この未通過の領域に溜まっていた:
+実際、この 6 つは全部この未通過の領域に溜まっていた:
 
 - ページを送るたびに pdf.js のドキュメントとワーカーを作り直していた
 - デッキを移っても前のデッキの再生中フラグとサムネイルが残っていた
 - `PDFDocumentProxy.destroy` が消えたのに `doc?.destroy?.()` のままで、
   離れてもワーカーが残っていた
+- `paintText` が await の後で `replaceChildren()` していたので、速く送ると古い層の
+  後片付けが今のページのテキストを消していた（`TextLayer.cancel()` を呼んでいなかった）
+- 読み込み中に離れると、`loadingTask.destroy()` が起こす reject を `boot()` の catch が
+  拾って、もう外れているコンポーネントに `failed` を撃っていた
+- `useSlideKeys` が `page` を閉じ込んでいたので、commit より速く来た keydown が
+  全部同じ行き先を計算して、矢印キーの連打を取りこぼしていた
 
-だから **Marp か手元の PDF を足した回は、必ずブラウザで開いて見る**。
-`decks/_examples/marp-deck` を `decks/` にコピーすれば手元で通せる。見るのは:
+**ビルドの経路は CI が毎回通す。** `verify-decks` ジョブが `decks/_examples` の 3 形式を
+`DECKS_DIR` 越しに焼き、`scripts/check-decks.mjs` が出力の中身を見る（表紙の標準偏差が
+0 なら単色 = 描画に失敗、サムネイルの欠け、検索用テキストが空、など）。手元では
+`npm run decks:examples`。
+
+**それでも「動くか」は別。** 上の 6 件のうち 4 件はブラウザでしか出ない。だから
+**Marp か手元の PDF を足した回は、必ずブラウザで開いて見る**。
+`decks/_examples/pdf-deck` を `decks/` にコピーすれば手元で通せる（Chrome が要らない）。
+見るのは:
 
 | 見るもの | 期待 |
 | --- | --- |
@@ -195,6 +238,13 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 pdf.js の描画は `requestAnimationFrame` を回す。**不可視タブでは完了しない**ので、
 自動化した Chrome で「`data-state` が `ready` にならない」のはバグではない
 （`document.visibilityState` を先に見る）。
+
+止まるのは初回描画だけではない。**不可視タブではページを送っても描き替わらない** —
+`draw()` の描画が終わらないので `show()` がそこで待ち続け、canvas は前のページのまま
+残る。しかも例外は出ないので、そのまま測ると「2 ページ目以降で固まる」という嘘の結論が
+出る（一度そう読んだ）。**JS を注入するたびにタブは背面へ回るので、`javascript_tool` の
+ループでページ送りを測ってはいけない。** 送るのは実際のキー操作かクリックで行い、
+JS は描き終わったあとの読み取りだけに使う。
 
 ## 依存関係
 
