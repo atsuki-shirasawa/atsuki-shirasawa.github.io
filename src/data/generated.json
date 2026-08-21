@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-20T05:20:22.740Z",
+  "fetchedAt": "2026-08-21T06:03:19.053Z",
   "posts": [
     {
       "date": "2025-12",
@@ -72,7 +72,7 @@
     "login": "atsuki-shirasawa",
     "avatarUrl": "https://avatars.githubusercontent.com/u/108639914?v=4&s=240",
     "publicRepos": 16,
-    "totalContributions": 3964,
+    "totalContributions": 4030,
     "weeks": [
       [
         {
@@ -2021,10 +2021,14 @@
         },
         {
           "d": "2026-08-20",
-          "c": 21,
-          "l": 2
+          "c": 45,
+          "l": 3
         },
-        null,
+        {
+          "d": "2026-08-21",
+          "c": 42,
+          "l": 3
+        },
         null
       ]
     ]
