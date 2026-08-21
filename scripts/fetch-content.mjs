@@ -44,7 +44,7 @@ async function getJson(url, headers = {}) {
   return res.json()
 }
 
-function githubToken() {
+function resolveGitHubToken() {
   const fromEnv = process.env.GITHUB_TOKEN || process.env.GH_TOKEN
   if (fromEnv) return fromEnv
   try {
@@ -53,6 +53,14 @@ function githubToken() {
   } catch {
     return null
   }
+}
+
+/** 借りたトークンは覚える。呼び手が 2 人いるので、環境変数の無い手元では
+    gh auth token が 2 回起動していた（null も覚えるので undefined と区別する） */
+let cachedToken
+function githubToken() {
+  if (cachedToken === undefined) cachedToken = resolveGitHubToken()
+  return cachedToken
 }
 
 /** RSS の pubDate → YYYY-MM */
@@ -102,8 +110,9 @@ async function fetchGitHubProfile() {
   const token = githubToken()
   const headers = token ? { authorization: `Bearer ${token}` } : {}
   const user = await getJson(`https://api.github.com/users/${GITHUB_USER}`, headers)
+  // login は返さない。出力に載るのは main() が持つ GITHUB_USER のほうで、
+  // ここの値は誰も読んでいなかった
   return {
-    login: user.login,
     // 表示は最大 64px なので 2x 相当を要求しておく
     avatarUrl: `${user.avatar_url}&s=240`,
     publicRepos: user.public_repos,

@@ -3,7 +3,7 @@ import { ChevronIcon } from './icons/UiIcons'
 import { useFullscreen } from '../hooks/useFullscreen'
 import { useSlideKeys } from '../hooks/useSlideKeys'
 import { useSwipe } from '../hooks/useSwipe'
-import { clampPage } from '../lib/page'
+import { clampPage, pageRange } from '../lib/page'
 import {
   cMapPath,
   pdfPath,
@@ -12,6 +12,7 @@ import {
   thumbImage,
   thumbTemplate,
 } from '../lib/paths'
+import { aspectStyle } from '../lib/deckView'
 import { createSlideViewer, type SlideViewerHandle, type ViewerState } from '../lib/slideViewer'
 import type { Deck } from '../types'
 import styles from './SlideViewer.module.css'
@@ -114,7 +115,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
       aria-roledescription="slide deck"
       aria-label={deck.title}
     >
-      <div className={styles.stage} ref={stageRef} style={{ aspectRatio: String(deck.aspect) }}>
+      <div className={styles.stage} ref={stageRef} style={aspectStyle(deck.aspect)}>
         {/* 描いたページに合わせて script が寸法を決める。テキストとリンクの層が canvas と揃う */}
         <div className={styles.page} ref={boxRef}>
           <canvas className={styles.canvas} ref={canvasRef} />
@@ -175,12 +176,12 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
       </div>
 
       <ol className={styles.strip} ref={stripRef} role="list" aria-label="All pages">
-        {Array.from({ length: total }, (_, index) => index + 1).map((number) => (
+        {pageRange(total).map((number) => (
           <li className={styles.stripItem} key={number}>
             <button
               className={styles.stripButton}
               type="button"
-              style={{ aspectRatio: String(deck.aspect) }}
+              style={aspectStyle(deck.aspect)}
               aria-current={number === page ? 'true' : 'false'}
               onClick={() => go(number)}
             >

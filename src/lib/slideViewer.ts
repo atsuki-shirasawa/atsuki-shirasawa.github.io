@@ -252,7 +252,10 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
         const anchor = document.createElement('a')
         anchor.href = annotation.url
         anchor.target = '_blank'
-        anchor.rel = 'noopener noreferrer'
+        // ExternalLink と同じ rel にする。noreferrer は noopener を含むので
+        // 2 つ書く必要はない（外へ出るリンクの規則はコンポーネント側が持つが、
+        // ここは pdf.js の注釈から DOM を直に組むので通せない）
+        anchor.rel = 'noreferrer'
         anchor.title = annotation.url
         element = anchor
       } else if (annotation.dest) {

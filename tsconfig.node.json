@@ -5,6 +5,9 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "types": ["node"],
+    // vite.config.ts が src の 2 ファイルを拡張子付きで読む（native config loader
+    // が拡張子なしを解けない）。noEmit なので有効にできる
+    "allowImportingTsExtensions": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noEmit": true,

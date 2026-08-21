@@ -81,9 +81,13 @@ export default function Slides() {
         )}
 
         {filtered && (
-          <p className="font-mono flex items-center gap-3 text-note text-faint" aria-live="polite">
-            {results.length} {results.length === 1 ? 'result' : 'results'}
-            {activeTag && ` / tag: ${activeTag}`}
+          <p className="font-mono flex items-center gap-3 text-note text-faint">
+            {/* live 領域は数字だけ。ボタンまで含めると、件数が変わるたびに
+                「Clear」まで読み上げられる */}
+            <span aria-live="polite">
+              {results.length} {results.length === 1 ? 'result' : 'results'}
+              {activeTag && ` / tag: ${activeTag}`}
+            </span>
             <button
               className="tap cursor-pointer p-0 text-note text-accent underline"
               type="button"
@@ -105,6 +109,7 @@ export default function Slides() {
             <DeckCard
               deck={deck}
               key={deck.slug}
+              heading="h2"
               eager={index < 2}
               onTagClick={(tag) => update({ tag })}
             />

@@ -9,7 +9,7 @@ import { MoonIcon, SlidesIcon, SunIcon } from './icons/UiIcons'
  * text-fg を足す書き方は効かない — 同じ詳細度なので、勝つのは class 属性の
  * 並びではなく生成 CSS の並び（text-muted が後ろに出る）。
  */
-const NAV_LINK = 'tap inline-flex items-center gap-1.5 border-b-2 pb-0.5 hover:text-fg hover:no-underline'
+const NAV_LINK = 'tap inline-flex items-center gap-1.5 border-b-2 pb-0.5 no-underline hover:text-fg'
 
 export default function Header({
   isDark,
@@ -28,7 +28,7 @@ export default function Header({
       <div className="wrap flex h-16 items-center justify-between gap-4">
         <NavLink
           to="/"
-          className="tap flex shrink-0 items-center gap-2.5 text-strong font-bold tracking-[0.02em] text-fg hover:text-fg hover:no-underline"
+          className="quiet-link tap flex shrink-0 items-center gap-2.5 text-strong font-bold tracking-[0.02em]"
         >
           <span className="inline-block size-2.5 rounded-xs bg-accent" aria-hidden="true" />
           {profile.siteName}
@@ -43,7 +43,7 @@ export default function Header({
           </NavLink>
           {/* 幅が足りなくなったら畳む（Hero とフッター側に導線がある） */}
           <ExternalLink
-            className="tap inline-flex items-center gap-1.5 whitespace-nowrap text-muted hover:text-accent hover:no-underline max-tiny:hidden"
+            className="tap inline-flex items-center gap-1.5 whitespace-nowrap text-muted no-underline hover:text-accent max-tiny:hidden"
             href={profile.links.github}
           >
             <GitHubIcon size={14} />

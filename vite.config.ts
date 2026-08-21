@@ -2,8 +2,10 @@ import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { avatarAlt, metaDescription, profile, siteTitle } from './src/data/profile'
-import { THEME_STORAGE_KEY } from './src/lib/theme'
+// 拡張子を書くのは vite の native config loader が拡張子なしを解けないため。
+// この 2 つは import を持たないので、設定から辿る枝はここで閉じる
+import { avatarAlt, identity, metaDescription, siteTitle } from './src/data/identity.ts'
+import { THEME_STORAGE_KEY } from './src/lib/theme.ts'
 
 // GitHub Pages のユーザーサイト配信を前提に base を決める。
 // 既定は https://atsuki-shirasawa.github.io/
@@ -41,7 +43,7 @@ const INJECT: Record<string, string> = {
   __OG_IMAGE__: ogImage,
   __TITLE__: siteTitle,
   __DESCRIPTION__: metaDescription,
-  __SITE_NAME__: profile.siteName,
+  __SITE_NAME__: identity.siteName,
   __IMAGE_ALT__: avatarAlt,
   __THEME_KEY__: THEME_STORAGE_KEY,
 }

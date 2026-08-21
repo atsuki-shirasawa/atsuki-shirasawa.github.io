@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { deckView, formatDeckDate, hostOf, previewPages } from './deckView'
+import { aspectStyle, deckView, formatDeckDate, hostOf, previewPages } from './deckView'
 import type { Deck, DeckVideo } from '../types'
 
 const video = (id: string, start = 0): DeckVideo => ({ provider: 'youtube', id, start })
@@ -97,5 +97,12 @@ describe('formatDeckDate', () => {
 
   it('日付が無いデッキは空文字（要素を出さない側で判断する）', () => {
     expect(formatDeckDate(null)).toBe('')
+  })
+})
+
+describe('aspectStyle', () => {
+  it('CSS の aspect-ratio は数値を文字列で受ける', () => {
+    expect(aspectStyle(1.7778)).toEqual({ aspectRatio: '1.7778' })
+    expect(aspectStyle(1)).toEqual({ aspectRatio: '1' })
   })
 })

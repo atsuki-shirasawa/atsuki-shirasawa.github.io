@@ -32,7 +32,7 @@ export default function Writing() {
                 {post.date}
               </span>
               <ExternalLink
-                className="tap group grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2.5 text-fg hover:no-underline"
+                className="tap group grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2.5 text-fg no-underline"
                 href={post.url}
               >
                 {/* svg の行送りぶんを消してアイコンを文字のベースラインに合わせる */}

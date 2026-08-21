@@ -7,7 +7,7 @@ import VideoEmbed from '../components/VideoEmbed'
 import { deckBySlug, deckNeighbours } from '../data/decks'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQueryUpdate } from '../hooks/useQueryUpdate'
-import { deckView, formatDeckDate, type DeckView } from '../lib/deckView'
+import { aspectStyle, deckView, formatDeckDate, type DeckView } from '../lib/deckView'
 import { textLang } from '../lib/lang'
 import { parsePageParam } from '../lib/page'
 import { pdfPath, thumbImage } from '../lib/paths'
@@ -16,7 +16,7 @@ import type { Deck } from '../types'
 const FORMAT_LABEL = { marp: 'Markdown (Marp)', pdf: 'PDF', video: 'Video only' } as const
 
 /** 浮く箱。枠と影の振る舞いは @utility lift が持つ */
-const LIFT = 'lift group rounded-xl bg-surface text-fg hover:text-fg hover:no-underline'
+const LIFT = 'lift quiet-link group rounded-xl bg-surface'
 
 /** 資料の入手先のボタン。塗りの色は solid-accent が地色と文字色を対で持つ */
 const DOWNLOAD =
@@ -46,7 +46,7 @@ function Stage({
           className="w-[min(360px,46%)] shrink-0 rounded-lg border border-line object-cover max-snug:w-full"
           src={thumbImage(deck.slug, 1)}
           alt={`Cover slide of ${deck.title}`}
-          style={{ aspectRatio: String(deck.aspect) }}
+          style={aspectStyle(deck.aspect)}
         />
         <span className="text-label leading-prose text-muted">
           <strong className="mb-1.5 block text-lead text-fg group-hover:text-accent">
@@ -62,8 +62,10 @@ function Stage({
     <>
       <SlideViewer deck={deck} page={page} onPageChange={onPageChange} />
       {deck.video && (
-        <section className="flex flex-col gap-3.5 pt-10">
-          <h2 className="font-mono text-note tracking-caps text-faint">TALK VIDEO</h2>
+        // 主役はページの題より前に置く並びなので、ここに h2 を出すと h1 より
+        // 先に来て階層が逆さになる。名前は aria-label で領域に付ける
+        <section className="flex flex-col gap-3.5 pt-10" aria-label="Talk video">
+          <p className="font-mono text-note tracking-caps text-faint">TALK VIDEO</p>
           <VideoEmbed video={deck.video} title={deck.title} />
         </section>
       )}

@@ -2,12 +2,13 @@ import { Link } from 'react-router-dom'
 import CareerTrack from './CareerTrack'
 import ExternalLink from './ExternalLink'
 import { github } from '../data/content'
-import { avatarAlt, profile } from '../data/profile'
+import { avatarAlt } from '../data/identity'
+import { profile } from '../data/profile'
 import { SITE_ORDER, SITES } from './sites'
 
 /** 3 つのボタンの共通の箱。padding は指で押せる 44px に乗せる高さ */
 const BUTTON =
-  'inline-flex items-center gap-2 rounded-lg border px-4.5 py-2.75 text-body font-semibold transition-colors hover:no-underline'
+  'inline-flex items-center gap-2 rounded-lg border px-4.5 py-2.75 text-body font-semibold transition-colors no-underline'
 
 /** 従。地色を持たせず、罫線と抑えた文字色で主より一段落とす */
 const BUTTON_OUTLINE = `${BUTTON} border-line bg-transparent text-muted`
@@ -38,7 +39,7 @@ export default function Hero() {
 
         {github.avatarUrl && (
           <ExternalLink
-            className="group inline-flex shrink-0 rounded-full leading-[0] hover:no-underline max-narrow:-order-1"
+            className="group inline-flex shrink-0 rounded-full leading-[0] no-underline max-narrow:-order-1"
             href={profile.links.github}
             title={`github.com/${github.login}`}
           >

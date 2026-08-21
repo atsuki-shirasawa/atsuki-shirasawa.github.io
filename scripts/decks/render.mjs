@@ -64,10 +64,11 @@ export async function renderPdf(pdfPath, outDir, coverOnly = false) {
     if (isFirst) {
       await sharp(png).webp({ quality: 86, effort: 4 }).toFile(path.join(outDir, 'p-1.webp'))
     }
-    await sharp(png)
-      .resize({ width: OUTPUT_CONFIG.thumbWidth, withoutEnlargement: true })
-      .webp({ quality: 74, effort: 4 })
-      .toFile(path.join(outDir, `t-${pageNumber}.webp`))
+    // 縮めるのは posterWidth で描いた 1 ページ目だけ。2 ページ目以降は canvas が
+    // すでに thumbWidth なので、掛けても withoutEnlargement で必ず no-op だった
+    const thumb = sharp(png)
+    if (isFirst) thumb.resize({ width: OUTPUT_CONFIG.thumbWidth, withoutEnlargement: true })
+    await thumb.webp({ quality: 74, effort: 4 }).toFile(path.join(outDir, `t-${pageNumber}.webp`))
 
     if (!coverOnly) {
       const textContent = await page.getTextContent()

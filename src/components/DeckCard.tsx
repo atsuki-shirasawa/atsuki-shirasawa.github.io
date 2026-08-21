@@ -2,13 +2,19 @@ import DeckLink from './DeckLink'
 import DeckTags from './DeckTags'
 import PlayBadge from './PlayBadge'
 import YouTubeThumb from './YouTubeThumb'
-import { deckView, formatDeckDate, previewPages } from '../lib/deckView'
+import { aspectStyle, deckView, formatDeckDate, previewPages } from '../lib/deckView'
 import { textLang } from '../lib/lang'
 import { thumbImage } from '../lib/paths'
 import type { Deck } from '../types'
 
 type Props = {
   deck: Deck
+  /**
+   * 見出しの階層。置いた場所で変わる — /slides は h1 が「Slides」なのでカードは
+   * h2、Home の TALKS は節見出しが h2 なのでその下は h3。カード側で固定すると
+   * どちらか片方で階層が飛ぶ。
+   */
+  heading?: 'h2' | 'h3'
   /** 最初の数枚だけ先に読み込ませる */
   eager?: boolean
   onTagClick?: (tag: string) => void
@@ -26,7 +32,7 @@ const PAGE_OVER = `${PAGE} opacity-0 group-hover:animate-page-turn group-focus-v
 const COUNT =
   'font-mono absolute top-2 right-2 -translate-y-1 rounded-full bg-glass px-2 py-1 text-meta leading-none text-on-media opacity-0 backdrop-blur-sm transition-[opacity,translate] duration-250 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100'
 
-export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
+export default function DeckCard({ deck, heading: Heading = 'h3', eager = false, onTagClick }: Props) {
   const view = deckView(deck)
   /** 動画が本体のカードでは、再生の的を中央に大きく置く */
   const lead = view.kind === 'video'
@@ -36,9 +42,9 @@ export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
       <DeckLink
         deck={deck}
         view={view}
-        className="group block text-fg hover:text-fg hover:no-underline"
+        className="quiet-link group block"
       >
-        <div className={STAGE} style={{ aspectRatio: String(deck.aspect) }}>
+        <div className={STAGE} style={aspectStyle(deck.aspect)}>
           {view.kind === 'video' ? (
             // 録画だけの登壇。カードの絵は動画のサムネイルになる
             <YouTubeThumb
@@ -86,12 +92,12 @@ export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
             </p>
           )}
         </div>
-        <h3
+        <Heading
           className="mt-3.5 text-display-2xs leading-lead font-bold text-pretty group-hover:text-accent"
           lang={textLang(deck.title)}
         >
           {deck.title}
-        </h3>
+        </Heading>
       </DeckLink>
 
       <p className="font-mono flex flex-wrap gap-x-3 gap-y-1 text-note text-faint">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clampPage, parsePageParam } from './page'
+import { clampPage, pageRange, parsePageParam } from './page'
 
 // URL の ?p= / ビューアのページ送り / pdf.js の描画要求が同じ規則で動く必要がある。
 // 3 箇所が別々に丸めると「URL は 7 なのに 6 ページ目が出る」が起きる。
@@ -43,5 +43,21 @@ describe('parsePageParam', () => {
     expect(parsePageParam('99', 6)).toBe(6)
     expect(parsePageParam('0', 6)).toBe(1)
     expect(parsePageParam('-3', 6)).toBe(1)
+  })
+})
+
+describe('pageRange', () => {
+  it('1 から count まで', () => {
+    expect(pageRange(4)).toEqual([1, 2, 3, 4])
+    expect(pageRange(1)).toEqual([1])
+  })
+
+  it('0 以下は空（動画だけのデッキは pageCount が 0）', () => {
+    expect(pageRange(0)).toEqual([])
+    expect(pageRange(-3)).toEqual([])
+  })
+
+  it('端数は切り捨てる', () => {
+    expect(pageRange(2.9)).toEqual([1, 2])
   })
 })

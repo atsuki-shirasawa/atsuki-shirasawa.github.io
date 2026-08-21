@@ -136,6 +136,14 @@
   --breakpoint-tiny: 30rem; /* 480px — 入りきらない導線を畳む */
 
   /*
+   * section-row の骨格。CareerTrack.module.css の .leg::before が「左列 + gap の
+   * 中央」に縦線を通すので、計算済みの 162px を写すのではなくこの 2 つから引く。
+   * 写していたころは、左列を変えると CAREER のレーンだけ静かにずれた。
+   */
+  --section-label: 150px;
+  --section-gap: 24px;
+
+  /*
    * カードの上でスライドがめくれる。4 枚を 2.8s で回し、0.7s ずつずらして
    * 重ねる（遅れは置いた側が animation-delay で持つ）。steps(1, end) は
    * 中間を描かせないため — 紙は溶けずに入れ替わる。
@@ -306,14 +314,28 @@
 }
 
 /*
+ * 囲みごとリンクにしている場所（カード・ヘッダのロゴ・浮く箱）。@layer base の
+ * a と a:hover が accent2 で塗って下線を引くので、それを打ち消す。
+ *
+ * 打ち消しに hover: は要らない。utility は @layer utilities に出るので、詳細度に
+ * 関係なく @layer base の a:hover に勝つ（レイヤーの順が詳細度より先に決まる）。
+ * text-fg hover:text-fg hover:no-underline と 3 つ書いていたのはそのためで、
+ * うち 2 つは何もしていなかった。
+ */
+@utility quiet-link {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+/*
  * CAREER / TECH STACK / WRITING に共通の「左に固定幅、右に中身」の行。
  * 3 箇所で写されていて、揺れていたのは縦の padding とたたんだ後の gap だけ
  * だった。骨格をここに置いて、違うぶんは使う側で足す。
  */
 @utility section-row {
   display: grid;
-  grid-template-columns: 150px 1fr;
-  gap: 24px;
+  grid-template-columns: var(--section-label) 1fr;
+  gap: var(--section-gap);
   border-bottom: 1px solid var(--line2);
 
   /* 次の節の上罫線とすぐ並ぶので、最後の行では引かない */

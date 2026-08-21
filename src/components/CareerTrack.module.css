@@ -175,7 +175,8 @@
 
 /*
  * 道が折れて下へ続く。左列（年）と本文のあいだを通すので、位置は section-row の
- * 格子に合わせる — 左列 150px + gap 24px の中央。
+ * 格子から引く（--section-label と --section-gap は theme.css が持つ）。計算済みの
+ * 162px を写していたころは、左列の幅を変えるとここだけ取り残された。
  */
 .leg {
   position: relative;
@@ -185,7 +186,7 @@
 .leg::after {
   content: '';
   position: absolute;
-  left: 162px;
+  left: calc(var(--section-label) + var(--section-gap) / 2);
 }
 
 /* 過去の区間は測量済みの破線。Hero の .lane と同じ様式 */

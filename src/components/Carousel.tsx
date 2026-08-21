@@ -34,8 +34,11 @@ export default function Carousel({ name, children }: Props) {
     const el = railRef.current
     if (!el) return
     const card = el.firstElementChild
+    // 隙間は CSS が持つ（.track の gap）。ここに 20 を写すと、片方だけ直したときに
+    // 送り幅がカード 1 枚とずれる
+    const gap = Number.parseFloat(getComputedStyle(el).columnGap) || 0
     // カード 1 枚ぶんずつ送る。取れなければ画面幅の 8 割で代用する
-    const step = card ? card.getBoundingClientRect().width + 20 : el.clientWidth * 0.8
+    const step = card ? card.getBoundingClientRect().width + gap : el.clientWidth * 0.8
     el.scrollBy({ left: direction * step, behavior: 'smooth' })
   }
 

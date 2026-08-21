@@ -1,6 +1,7 @@
 // デッキの見せ方は 3 通りしかない。format / source / video の組み合わせから毎回
 // 組み立て直すと、カードと詳細で判断がずれる（実際 videoOnly と away の 2 変数を
 // 4 箇所で別々に復元していた）。ここで 1 度だけ決めて、あとは kind で分岐する。
+import { pageRange } from './page'
 import { watchUrl } from './video'
 import type { Deck, DeckVideo } from '../types'
 
@@ -37,8 +38,16 @@ export function hostOf(url: string): string {
 
 /** カードのめくりプレビューに使うページ。借りものの資料は表紙だけ */
 export function previewPages(deck: Deck, view: DeckView): number[] {
-  const shown = view.kind === 'away' ? 1 : Math.min(deck.pageCount, PREVIEW_PAGES)
-  return Array.from({ length: shown }, (_, index) => index + 1)
+  return pageRange(view.kind === 'away' ? 1 : Math.min(deck.pageCount, PREVIEW_PAGES))
+}
+
+/**
+ * スライドの縦横比を style に載せる形。4 箇所（カード・ビューアの舞台・
+ * フィルムストリップ・借りものの表紙）が同じ String() を書いていた。
+ * CSS の aspect-ratio は数値を文字列で受ける。
+ */
+export function aspectStyle(aspect: number): { aspectRatio: string } {
+  return { aspectRatio: String(aspect) }
 }
 
 /** 2026-07-30 を 2026.07.30 に */

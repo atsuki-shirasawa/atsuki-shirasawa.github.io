@@ -4,7 +4,7 @@ import TechStack from '../components/TechStack'
 import GitHubActivity from '../components/GitHubActivity'
 import Writing from '../components/Writing'
 import Talks from '../components/Talks'
-import { siteTitle } from '../data/profile'
+import { siteTitle } from '../data/identity'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function Home() {
