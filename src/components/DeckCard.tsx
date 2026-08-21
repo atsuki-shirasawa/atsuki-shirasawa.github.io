@@ -33,7 +33,11 @@ export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
 
   return (
     <article className="flex flex-col gap-2">
-      <DeckLink deck={deck} className="group block text-fg hover:text-fg hover:no-underline">
+      <DeckLink
+        deck={deck}
+        view={view}
+        className="group block text-fg hover:text-fg hover:no-underline"
+      >
         <div className={STAGE} style={{ aspectRatio: String(deck.aspect) }}>
           {view.kind === 'video' ? (
             // 録画だけの登壇。カードの絵は動画のサムネイルになる

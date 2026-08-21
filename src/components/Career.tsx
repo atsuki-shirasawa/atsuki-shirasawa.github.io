@@ -1,4 +1,4 @@
-import { careerLegs } from '../lib/career'
+import { legs } from '../data/career'
 // Hero の道が縦に折れて続く節なので、車線の意匠は CareerTrack と 1 枚で持つ
 import styles from './CareerTrack.module.css'
 
@@ -9,7 +9,7 @@ export default function Career() {
         <h2 className="section-title">CAREER</h2>
       </div>
       <div>
-        {careerLegs().map(({ entry, period, years, showOrg, isCurrent, isEarliest }) => (
+        {legs.map(({ entry, period, years, showOrg, isCurrent, isEarliest }) => (
           <div
             className={`section-row ${styles.leg} py-4.5 max-narrow:gap-2`}
             // 車線の描き分け。在職中の区間だけ実線にして、いちばん古い区間で線を止める

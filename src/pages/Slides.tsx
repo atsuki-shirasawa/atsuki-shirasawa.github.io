@@ -1,7 +1,6 @@
-import { useMemo } from 'react'
 import DeckCard from '../components/DeckCard'
 import { SearchIcon } from '../components/icons/UiIcons'
-import { decks, tagIndex } from '../data/decks'
+import { deckTags, decks } from '../data/decks'
 import { useDeckSearch } from '../hooks/useDeckSearch'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQueryUpdate } from '../hooks/useQueryUpdate'
@@ -16,7 +15,6 @@ export default function Slides() {
 
   usePageTitle('Slides — Atsuki Shirasawa')
 
-  const tags = useMemo(() => tagIndex(), [])
   const results = useDeckSearch(query, activeTag)
 
   const filtered = query.trim() !== '' || activeTag !== ''
@@ -55,9 +53,9 @@ export default function Slides() {
               />
             </div>
 
-            {tags.length > 0 && (
+            {deckTags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pointer-coarse:gap-2.5">
-                {tags.map(({ tag, count }) => (
+                {deckTags.map(({ tag, count }) => (
                   <button
                     className="chip"
                     type="button"

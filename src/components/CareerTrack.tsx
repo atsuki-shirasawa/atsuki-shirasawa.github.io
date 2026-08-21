@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { careerTrack } from '../lib/career'
+import { track } from '../data/career'
 import styles from './CareerTrack.module.css'
 
 /**
@@ -15,7 +15,7 @@ export default function CareerTrack() {
   const [drawn, setDrawn] = useState(false)
 
   // 位置の計算は lib/career.ts。CAREER の縦レーンと同じ 1 つの読みから引く
-  const { start, turnYear, turn, ticks, at } = careerTrack()
+  const { start, turnYear, turn, ticks, at } = track
 
   useEffect(() => {
     const node = ref.current

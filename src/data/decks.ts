@@ -24,7 +24,7 @@ export function deckNeighbours(slug: string) {
 }
 
 /** タグを使用数の多い順に */
-export function tagIndex(): { tag: string; count: number }[] {
+function tagIndex(): { tag: string; count: number }[] {
   const counts = new Map<string, { tag: string; count: number }>()
   for (const deck of decks) {
     for (const tag of deck.tags) {
@@ -36,6 +36,13 @@ export function tagIndex(): { tag: string; count: number }[] {
   }
   return [...counts.values()].sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
 }
+
+/**
+ * 一覧に出すタグ。入力は decks.json なのでビルド時に決まる — 描画ごとに数え直す
+ * 理由が無いので 1 度だけ評価する（useMemo(…, []) は依存配列が空になるだけで、
+ * 何も守らない）。
+ */
+export const deckTags = tagIndex()
 
 /** 検索対象にする、本文以外のテキスト */
 export function deckHaystack(deck: Deck): string {

@@ -1,9 +1,8 @@
-import { useMemo } from 'react'
 import ExternalLink from './ExternalLink'
-import { github } from '../data/content'
+import { calendar, github } from '../data/content'
 import { profile } from '../data/profile'
 import { useDayTooltip } from '../hooks/useDayTooltip'
-import { currentStreak, formatCount, longestStreak, readCalendar } from '../lib/contributions'
+import { currentStreak, formatCount, longestStreak } from '../lib/contributions'
 import { GitHubIcon } from './icons/BrandIcons'
 import type { ContributionLevel } from '../types'
 
@@ -23,7 +22,6 @@ const HEAT: Record<ContributionLevel, string> = {
 /** 凡例に並べる濃さ */
 const LEVELS = Object.keys(HEAT).map(Number) as ContributionLevel[]
 
-/** 並びに合わせて幅いっぱいまで広がるマス */
 /*
  * 日付と本数を出す小さな札。1 行しか入らない（whitespace-nowrap）ので、
  * 行送りは読みやすさではなく札の高さを決めているだけ。1.3 は 11px で 14px。
@@ -31,26 +29,28 @@ const LEVELS = Object.keys(HEAT).map(Number) as ContributionLevel[]
 const TOOLTIP =
   'font-mono pointer-events-none absolute z-3 -translate-x-1/2 -translate-y-[calc(100%+8px)] rounded-md bg-fg px-2 py-1.25 text-meta leading-[1.3] whitespace-nowrap text-bg'
 
+/** 並びに合わせて幅いっぱいまで広がるマス */
 const CELL = 'block aspect-square w-full rounded-xs'
 /** 凡例のマスだけは広げず 10px で固定する */
 const LEGEND_CELL = 'block size-2.5 flex-none rounded-xs'
 
 type Stat = { value: number; label: string; lead?: boolean }
 
-export default function GitHubActivity() {
-  const { cells, days, months, latest } = useMemo(() => readCalendar(github.weeks), [])
-  const { wrapRef, tip, surface, grid } = useDayTooltip(cells, latest)
+const { cells, days, months, latest } = calendar
 
-  const stats = useMemo<Stat[]>(
-    // 年間合計だけを主にする。週平均と最も濃かった月は年間合計の言い換えなので置かない
-    () => [
-      { value: github.totalContributions, label: 'contributions (year)', lead: true },
-      { value: github.publicRepos, label: 'public repos' },
-      { value: currentStreak(days), label: 'current streak (days)' },
-      { value: longestStreak(days), label: 'longest streak (days)' },
-    ],
-    [days],
-  )
+/**
+ * 下に並べる数字。年間合計だけを主にする — 週平均と最も濃かった月は年間合計の
+ * 言い換えなので置かない。入力は generated.json なのでここもビルド時に決まる。
+ */
+const STATS: Stat[] = [
+  { value: github.totalContributions, label: 'contributions (year)', lead: true },
+  { value: github.publicRepos, label: 'public repos' },
+  { value: currentStreak(days), label: 'current streak (days)' },
+  { value: longestStreak(days), label: 'longest streak (days)' },
+]
+
+export default function GitHubActivity() {
+  const { wrapRef, tip, surface, grid } = useDayTooltip(cells, latest)
 
   return (
     <section className="section">
@@ -141,7 +141,7 @@ export default function GitHubActivity() {
 
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 border-t border-t-line2 pt-4">
           <div className="flex flex-wrap gap-x-7 gap-y-4 max-tight:gap-x-5">
-            {stats.map((stat) => (
+            {STATS.map((stat) => (
               <div className="flex flex-col gap-0.5" key={stat.label}>
                 {/* 年間合計はほかの数字と同格にしない。ここだけ計器ではなく見出しの声で読ませる */}
                 <span
