@@ -173,7 +173,7 @@ html[data-theme='dark'] {
 }
 
 .section-title {
-  font-size: 14px;
+  font-size: var(--text-body);
   font-family: var(--font-mono);
   font-weight: 500;
   letter-spacing: var(--tracking-caps);
@@ -183,7 +183,7 @@ html[data-theme='dark'] {
 .section-links {
   display: flex;
   gap: 16px;
-  font-size: 13px;
+  font-size: var(--text-label);
 }
 
 @media (width < 45rem) {

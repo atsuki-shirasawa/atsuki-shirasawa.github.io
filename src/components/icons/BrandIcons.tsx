@@ -41,7 +41,7 @@ export function QiitaIcon({ size = 16, className }: IconProps) {
   )
 }
 
-/** GitHub — simple-icons v16.28.0 (CC0 1.0) より。ブランドカラーは持たせず currentColor に従う */
+/** GitHub — simple-icons v16.28.0 (CC0 1.0) より。マークが単色なので媒体の色は --fg */
 export function GitHubIcon({ size = 16, className }: IconProps) {
   return (
     <svg

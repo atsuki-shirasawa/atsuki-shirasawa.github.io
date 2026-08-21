@@ -10,12 +10,14 @@ export default function Talks() {
     <section className="section">
       <div className="section-head">
         <h2 className="section-title">TALKS</h2>
-        <Link
-          className="tap text-label text-muted transition-colors hover:text-accent hover:no-underline"
-          to="/slides"
-        >
-          All talks <span aria-hidden="true">→</span>
-        </Link>
+        <div className="section-links">
+          <Link
+            className="tap text-muted transition-colors hover:text-accent hover:no-underline"
+            to="/slides"
+          >
+            All talks <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
       <Carousel name="Talks">
         {decks.map((deck, index) => (

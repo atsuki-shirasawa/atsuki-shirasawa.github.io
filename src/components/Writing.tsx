@@ -36,7 +36,7 @@ export default function Writing() {
         <div className="section-links">
           {authorProfiles.map((entry) => (
             <ExternalLink
-              className={`tap inline-flex items-center gap-1.75 whitespace-nowrap text-note text-muted transition-colors hover:no-underline ${siteColor[entry.site].hover}`}
+              className={`tap inline-flex items-center gap-1.75 whitespace-nowrap text-muted transition-colors hover:no-underline ${siteColor[entry.site].hover}`}
               href={entry.url}
               key={entry.site}
             >

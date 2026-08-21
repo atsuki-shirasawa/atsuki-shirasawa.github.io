@@ -4,6 +4,7 @@ import { github } from '../data/content'
 import { profile } from '../data/profile'
 import { useDayTooltip } from '../hooks/useDayTooltip'
 import { currentStreak, formatCount, longestStreak, readCalendar } from '../lib/contributions'
+import { GitHubIcon } from './icons/BrandIcons'
 import type { ContributionLevel } from '../types'
 
 /**
@@ -55,9 +56,20 @@ export default function GitHubActivity() {
     <section className="section">
       <div className="section-head">
         <h2 className="section-title">GITHUB ACTIVITY</h2>
-        <ExternalLink href={profile.links.github} className="tap text-label">
-          github.com/{github.login} ↗
-        </ExternalLink>
+        {/* 大きさと間隔は .section-links が持つ。リンクは色と状態だけを書く */}
+        <div className="section-links">
+          <ExternalLink
+            href={profile.links.github}
+            className="tap inline-flex items-center gap-1.75 whitespace-nowrap text-muted transition-colors hover:text-fg hover:no-underline"
+          >
+            {/*
+              WRITING と同じ形。媒体の色はアイコンだけが持ち、文字はホバーでそれに寄る。
+              GitHub のマークは単色なので、その色は --fg（明で黒、暗で白）になる。
+            */}
+            <GitHubIcon size={13} className="text-fg" />
+            github.com/{github.login} ↗
+          </ExternalLink>
+        </div>
       </div>
 
       <div className="card flex flex-col gap-5 p-6 max-tight:p-4.5">

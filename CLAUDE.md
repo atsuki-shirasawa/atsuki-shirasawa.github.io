@@ -265,6 +265,7 @@ Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で�
 | タグのチップを置く | `<DeckTags>`、または `chip` |
 | 版面で囲む | `wrap`（`container` ではない — Tailwind の組み込みとぶつかる） |
 | 節を作る | `section` / `section-head` / `section-title` |
+| 節見出しの右にリンクを置く | `section-links`（大きさと間隔は容器が持つ。リンク側は色と状態だけ書く） |
 | 左に固定幅・右に中身の行を作る | `section-row`（CAREER / TECH STACK / WRITING 共通） |
 | 罫線の箱をホバーで浮かせる | `lift` |
 | 塗りのボタンを置く | `solid-accent`（地色と文字色が対で付く。`#fff` を書かない） |
