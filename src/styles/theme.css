@@ -184,35 +184,6 @@
 }
 
 /*
- * アクセント色のごく淡いにじみで、写真を背景から浮かせる。
- *
- * arbitrary value では書けない。before:bg-[radial-gradient(...)] と書くと
- * 入れ子の color-mix() がグラデーションの停止位置として解釈され、16% が
- * 落ちて var(--accent) のべた塗りになる（実際に一度そうなった）。
- */
-@utility glow-accent {
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -14px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      color-mix(in srgb, var(--accent) 16%, transparent),
-      transparent 70%
-    );
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  &:hover::before {
-    opacity: 1;
-  }
-}
-
-/*
  * 塗りのボタン。ページでいちばん強い導線ひとつにだけ使う。
  *
  * 名前は Tailwind の名前空間を避ける。fill-accent と書くと組み込みの fill-*

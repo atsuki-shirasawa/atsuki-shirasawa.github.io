@@ -1,13 +1,28 @@
+/*
+ * 経歴の道。Hero の横のトラックと、CAREER の縦のレーンは 1 枚の同じ図なので
+ * 同じ module が持つ（破線＝測量済み / 実線＝進行中の様式を写さない）。
+ *
+ * 向きは折り返しても揃う。Hero は左から右へ古い順に進んで右端が現在、CAREER は
+ * 新しい順に並ぶので上端が現在。どちらも「実線の側が今」で読める。
+ */
+
 .eras {
   position: relative;
-  height: 15px;
+  height: 16px;
   margin-bottom: 10px;
 }
 
+/*
+ * 区間の位置は inline style ではなく custom property で受ける。狭い画面では
+ * 絶対配置をやめて凡例に落とすので、そこで left / width を無効化できる形が要る
+ * （inline style で来ると !important でしか上書けない）。
+ */
 .era {
   position: absolute;
   top: 0;
-  font-size: 11px;
+  left: var(--from);
+  width: var(--span);
+  font-size: 12px;
   letter-spacing: 0.02em;
   color: var(--faint);
   white-space: nowrap;
@@ -80,7 +95,7 @@
   opacity: 1;
 }
 
-/* 現在地 */
+/* 現在地。道の終端に点を立てる */
 .now {
   position: absolute;
   top: 1px;
@@ -101,14 +116,14 @@
 
 .years {
   position: relative;
-  height: 15px;
+  height: 16px;
   margin-top: 14px;
 }
 
 .year {
   position: absolute;
   top: 0;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--faint);
   translate: -50% 0;
   white-space: nowrap;
@@ -127,6 +142,95 @@
 /* 幅が足りない画面では節目の年を畳み、両端だけ残す */
 @media (width < 45rem) {
   .year[data-inner] {
+    display: none;
+  }
+
+  /*
+   * 区間の名前を道の上に載せるのをやめ、2 行の凡例に落とす。この幅では区間の
+   * 実寸（LLM agents 側は 50px ほど）に文字が入らず、省略記号で切れていた。
+   * どちらの線を指すかは色が持つ — faint が破線、accent が実線。
+   */
+  .eras {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: auto;
+    margin-bottom: 12px;
+  }
+
+  .era {
+    position: static;
+    left: auto;
+    width: auto;
+    overflow: visible;
+  }
+
+  .eraNow {
+    padding-left: 0;
+  }
+}
+
+/* --- CAREER の縦のレーン --- */
+
+/*
+ * 道が折れて下へ続く。左列（年）と本文のあいだを通すので、位置は section-row の
+ * 格子に合わせる — 左列 150px + gap 24px の中央。
+ */
+.leg {
+  position: relative;
+}
+
+.leg::before,
+.leg::after {
+  content: '';
+  position: absolute;
+  left: 162px;
+}
+
+/* 過去の区間は測量済みの破線。Hero の .lane と同じ様式 */
+.leg::before {
+  top: 0;
+  bottom: 0;
+  border-left: 2px dashed color-mix(in srgb, var(--fg) 32%, transparent);
+}
+
+/* 在職中の区間だけ実線。上端が「今」なので、実線は必ず最初の行に来る */
+.leg[data-now]::before {
+  border-left: 2px solid var(--accent);
+}
+
+/*
+ * いちばん古い区間は起点なので、線を節目の点で止める。下まで引くと
+ * 「まだ続きがある」に見える。
+ */
+.leg[data-start]::before {
+  bottom: auto;
+  height: 27px;
+}
+
+/*
+ * 節目。行の padding-top 18px + 役職名の半分ぶんで、左列の年と同じ高さに来る。
+ * 直径 7px なので中心 27px から 3.5px 引く。
+ */
+.leg::after {
+  top: 23.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--faint);
+  box-shadow: 0 0 0 3px var(--bg);
+  translate: -50% 0;
+}
+
+.leg[data-now]::after {
+  background: var(--accent);
+}
+
+/* 1 列に落ちたら格子が消えるのでレーンも畳む。道は Hero に残る */
+@media (width < 45rem) {
+  .leg::before,
+  .leg::after {
     display: none;
   }
 }

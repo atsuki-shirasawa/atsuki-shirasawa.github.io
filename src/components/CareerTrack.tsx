@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { career } from '../data/profile'
 import { currentYear } from '../lib/time'
 import styles from './CareerTrack.module.css'
 
 /**
- * 経歴を 1 本の線で引く。地図をつくっていた年月は測量済みの車線として破線で、
- * エージェントをつくっている今は実線と現在地の点で描く。
- * 節目の年は目盛りだけを打ち、役職ごとの内訳は下の CAREER が持つ。
+ * 経歴を 1 本の道で引く。Hero の主役。
+ *
+ * 地図をつくっていた年月は測量済みの車線として破線で、エージェントをつくって
+ * いる今は実線と現在地の点で描く。節目の年は目盛りだけを打ち、役職ごとの内訳は
+ * 下の CAREER が縦のレーンとして続きを持つ。
  */
 export default function CareerTrack() {
   const ref = useRef<HTMLDivElement>(null)
@@ -53,12 +56,13 @@ export default function CareerTrack() {
       aria-label={`Career timeline: map data and computer vision from ${start} to ${present.from}, LLM agents from ${present.from} to now. The list below has the detail.`}
     >
       <div className={`font-mono ${styles.eras}`} aria-hidden="true">
-        <span className={styles.era} style={{ left: 0, width: `${turn}%` }}>
+        {/* 位置は custom property で渡す。狭い画面では凡例に落として無効化する */}
+        <span className={styles.era} style={{ '--from': 0, '--span': `${turn}%` } as CSSProperties}>
           map data · computer vision
         </span>
         <span
           className={`${styles.era} ${styles.eraNow}`}
-          style={{ left: `${turn}%`, width: `${100 - turn}%` }}
+          style={{ '--from': `${turn}%`, '--span': `${100 - turn}%` } as CSSProperties}
         >
           LLM agents
         </span>

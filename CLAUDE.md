@@ -192,7 +192,8 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
   組み込みの `fill-*`（SVG の塗り）も同名で生成され、`fill:` が余分に付く。
   `fill / stroke / bg / text / border / accent / ring / shadow / outline` は使わない
 - **入れ子の `color-mix()` は arbitrary value に書けない。** グラデーションの
-  停止位置として解釈され、`16%` が落ちてべた塗りになる。`@utility` に出す
+  停止位置として解釈され、`16%` が落ちてべた塗りになる
+  （`before:bg-[radial-gradient(...)]` で踏んだ）。`@utility` か module に出す
 - **辺を指定する。** `border-t border-line` は 4 辺に色を置く。`border-t-line`
 - **折り返し点の境界を混ぜない。** `max-width: 720px` はちょうど 720px を含み、
   `max-narrow`（`width < 45rem`）は含まない。CSS 側も `width < Nrem` で書く
@@ -212,8 +213,14 @@ arbitrary value には**なぜその値かを書く場所が無い**ので、1 �
 | ファイル | 移すと増える arbitrary |
 | --- | --- |
 | `SlideViewer.module.css` | そもそも移せない。pdf.js が実行時に作る DOM（`:global(.textLayer)`）に className を渡せない |
-| `CareerTrack.module.css` | 7 つ。cubic-bezier 2 つ、`clip-path` 2 つ、`color-mix()` の破線色、`box-shadow`、字送り。10 要素すべてが 1 回きりの絶対配置で、共有するものが無い |
+| `CareerTrack.module.css` | 9 個。cubic-bezier 2 つ、`clip-path` 2 つ、`color-mix()` の破線色、点の `box-shadow`、字送り、レーンの位置（162px）と節目の高さ（23.5px）。ほぼ全部が 1 回きりの絶対配置 |
 | `Carousel.module.css` | 3 つ + 1 回しか使わない `@utility`（`::-webkit-scrollbar` に変種が無い）。レールの 12 宣言も他に出てこない |
+
+`CareerTrack.module.css` は **`CareerTrack.tsx` と `Career.tsx` の両方が import する**。
+Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で、破線＝測量済み /
+実線＝進行中という様式を共有している。別ファイルに割ると必ず片方だけずれる。
+向きは折り返しても揃う — Hero は左から右へ古い順で右端が現在、CAREER は新しい順に
+並ぶので上端が現在。どちらも「実線の側が今」で読める。
 
 逆に、**module に残っていても共有できるものは共有する**。矢印の線
 （`fill: none` / `stroke: currentColor` / 太さ / 端の丸め）は 2 つの module が
@@ -225,7 +232,7 @@ arbitrary value には**なぜその値かを書く場所が無い**ので、1 �
 - 再生のガラス円は `PlayBadge` に 1 つ。同じ絵を 3 つの大きさで使う
   （記章 26 / カード 56 / 埋め込み 68）。的の 2 つは 56 と 68 で残してある —
   載る面の幅が違う（カード 286px と版面いっぱい）ので、揃えるとどちらかが崩れる
-- CSS は導入前より増えている（gzip 7.1KB → 9.3KB）。この設計はほとんどの指定が
+- CSS は導入前より増えている（gzip 7.1KB → 9.4KB）。この設計はほとんどの指定が
   1 箇所しか出てこないので、utility の「1 宣言 1 セレクタ」が module より高くつく。
   得ているのは可読性と保守性で、バイト数ではない
 

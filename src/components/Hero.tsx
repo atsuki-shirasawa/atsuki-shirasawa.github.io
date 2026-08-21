@@ -14,7 +14,7 @@ const BUTTON_OUTLINE = `${BUTTON} border-line bg-transparent text-muted`
 
 export default function Hero() {
   return (
-    <section className="flex flex-col gap-11 pt-22 pb-14 max-wide:gap-9 max-narrow:gap-7 max-narrow:pt-14 max-narrow:pb-10">
+    <section className="flex flex-col gap-14 pt-22 pb-14 max-wide:gap-11 max-narrow:gap-8 max-narrow:pt-14 max-narrow:pb-10">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-12 max-wide:gap-8 max-narrow:grid-cols-1 max-narrow:justify-items-start max-narrow:gap-5.5">
         <div className="flex flex-col gap-4.5">
           <p className="font-mono text-label tracking-caps text-accent">{profile.eyebrow}</p>
@@ -33,12 +33,12 @@ export default function Hero() {
 
         {github.avatarUrl && (
           <ExternalLink
-            className="glow-accent group inline-flex shrink-0 rounded-full leading-[0] hover:no-underline max-narrow:-order-1"
+            className="group inline-flex shrink-0 rounded-full leading-[0] hover:no-underline max-narrow:-order-1"
             href={profile.links.github}
             title={`github.com/${github.login}`}
           >
             <img
-              className="relative size-[200px] rounded-full border border-line bg-chipbg object-cover transition-[border-color,translate] duration-200 group-hover:-translate-y-0.5 group-hover:border-accent max-wide:size-[150px] max-narrow:size-[104px]"
+              className="size-[200px] rounded-full border border-line bg-chipbg object-cover transition-[border-color,translate] duration-200 group-hover:-translate-y-0.5 group-hover:border-accent max-wide:size-[150px] max-narrow:size-[104px]"
               src={github.avatarUrl}
               alt={`${profile.name}'s GitHub avatar`}
               width={200}
@@ -50,7 +50,7 @@ export default function Hero() {
 
       <CareerTrack />
 
-      <div className="mt-2 flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3">
         {/* 主。塗りはこの 1 つだけに使う */}
         <Link className={`${BUTTON} solid-accent border-accent hover:border-accent2`} to="/slides">
           Slides <span aria-hidden="true">→</span>
