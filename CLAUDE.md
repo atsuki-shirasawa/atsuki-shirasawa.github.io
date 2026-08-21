@@ -133,7 +133,14 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
   `gh auth token` を自動で借り、CI は `secrets.GH_PAT`（無ければ `GITHUB_TOKEN`）
 - 静的ファイルの URL は文字列で組み立てず `src/lib/paths.ts` の `withBase()` を通す。
   プロジェクトサイトへ移したとき（`BASE_PATH=/<repo>/`）に壊れる
-- ルーティングはハッシュ（`/#/slides/<slug>`）。Pages に SPA フォールバックが無いため
+- ルーティングはハッシュ（`/#/slides/<slug>`）。Pages に SPA フォールバックが無いため。
+  **代償は共有カードが 1 組しか持てないこと** — フラグメントはサーバーに届かないので、
+  スクレイパが読むのは `index.html` だけ。デッキごとのカードを出すには、デッキごとの
+  静的 HTML を焼いてハッシュをやめる（`404.html` の SPA フォールバック）必要がある
+- 共有カード（`og:*` / `twitter:card`）と `theme-color` は `index.html`。絶対 URL は
+  スクレイパが相対を拾わないので、`base` を持っている `vite.config.ts` が
+  `__SITE_URL__` / `__OG_IMAGE__` に入れる（`&` は実体参照にする）。
+  `theme-color` は `useTheme` が実際の `--bg` を読んで書き換えるので、色をここに写さない
 - スライドのキーボード操作は `document` で受けるが、**奪うキーは選ぶ**。`←` `→` と
   `F` は常に効かせ、`Space` / `PageUp` / `PageDown` / `Home` / `End` は全画面のときだけ
   （通常表示のデッキ詳細は下に本文が続くので、奪うとキーボードで読み進められない）
@@ -332,3 +339,4 @@ Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で�
 | 記事を新しい順に並べる | `src/data/content.ts` の `posts`（すでに降順。`.tsx` で sort しない） |
 | クエリを書き換える | `useQueryUpdate()`（常に `replace`） |
 | 静的ファイルの URL を作る | `src/lib/paths.ts` の `withBase()` |
+| 共有カードの絶対 URL を組む | `vite.config.ts`（`siteOrigin` + `base`）。`index.html` に URL を写さない |

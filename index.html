@@ -9,6 +9,38 @@
       content="Portfolio of Atsuki Shirasawa — machine learning engineer. Production ML and MLOps work, tech articles and conference slide decks."
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="__SITE_URL__" />
+
+    <!--
+      ブラウザの外枠の色。global.css の --bg（light）と同値で、テーマを切り替えたら
+      useTheme が実際の --bg を読んで書き換える。prefers-color-scheme の media で
+      2 枚置く形は採らない — 手動トグルが OS の設定と食い違ったとき、外枠だけが
+      逆の色で残る。
+    -->
+    <meta name="theme-color" content="#fafaf8" />
+
+    <!--
+      共有カード。ハッシュルーティング（/#/slides/<slug>）なのでフラグメントは
+      サーバーに届かず、スクレイパが読むのはこの 1 枚だけ。だから OG はサイト全体で
+      1 組しか持てない。デッキごとのカードを出すには、デッキごとの静的 HTML を焼いて
+      ハッシュをやめる（Pages では 404.html の SPA フォールバック）必要がある。
+
+      __SITE_URL__ と __OG_IMAGE__ は vite.config.ts が入れる。
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="atsukish.dev" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="__SITE_URL__" />
+    <meta property="og:title" content="Atsuki Shirasawa — Machine Learning Engineer" />
+    <meta
+      property="og:description"
+      content="Portfolio of Atsuki Shirasawa — machine learning engineer. Production ML and MLOps work, tech articles and conference slide decks."
+    />
+    <meta property="og:image" content="__OG_IMAGE__" />
+    <meta property="og:image:alt" content="Atsuki Shirasawa's GitHub avatar" />
+    <!-- 出すのは正方形のプロフィール画像なので summary。1200×630 のカードを
+         用意したら summary_large_image に変える -->
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

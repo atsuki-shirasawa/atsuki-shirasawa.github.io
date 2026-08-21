@@ -15,6 +15,10 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
+    // ブラウザの外枠を地色に合わせる。色は CSS から読む — ここに #fafaf8 を
+    // 書くと、パレットが global.css とここの 2 箇所になる
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
+    if (bg) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg)
     try {
       localStorage.setItem(STORAGE_KEY, theme)
     } catch {
