@@ -125,6 +125,33 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 `title` は必須。値に `#` を含めるならクォートで囲む（裸だと YAML のコメント）。
 追加は `/new-deck` を使う。
 
+### 自前のスライドを置く回は、ビューアを実際に開く
+
+**`source:` を持つデッキ（よそにある PDF）と動画のみのデッキでは `SlideViewer` は
+動かない。** 表紙 1 枚か YouTube の埋め込みで終わるので、`pdf.js` の経路は
+`decks/` に「Marp か手元の PDF」が 1 本も無いあいだ**一度も通らない**。
+
+`src/lib/slideViewer.ts` と `SlideViewer.module.css` で 770 行あまり、コードの
+15% ほどがそこにある。型検査もビルドもここを通るが、どちらも「動くか」は見ない。
+実際、この 3 つは全部この未通過の領域に溜まっていた:
+
+- ページを送るたびに pdf.js のドキュメントとワーカーを作り直していた
+- デッキを移っても前のデッキの再生中フラグとサムネイルが残っていた
+- `PDFDocumentProxy.destroy` が消えたのに `doc?.destroy?.()` のままで、
+  離れてもワーカーが残っていた
+
+だから **Marp か手元の PDF を足した回は、必ずブラウザで開いて見る**。
+`decks/_examples/marp-deck` を `decks/` にコピーすれば手元で通せる。見るのは:
+
+| 見るもの | 期待 |
+| --- | --- |
+| `data-state` | `ready` になる。`loading` で止まるなら先に `document.visibilityState` を見る（不可視タブでは `requestAnimationFrame` が止まるので描画が完了しない） |
+| ページを送ったときの `pdf.worker` と `slides.pdf` の取得回数 | **増えない**。増えたらエンジンが作り直されている |
+| デッキを離れたあと | ワーカーが残らない（`loadingTask.destroy()` を通る） |
+| スライドの文字 | 選択・コピーできる（`textLayer`） |
+| スライド内のリンク | 押せる（`linkLayer`） |
+| フィルムストリップの番号 | 非選択のページでも読める（薄くするのは絵だけ） |
+
 ## その他の前提
 
 - Marp デッキの PDF 化に **Chrome か Chromium が必要**。無いときは `CHROME_PATH` を渡す。
