@@ -23,7 +23,7 @@ export default function Writing() {
       </div>
 
       {/* 左列の幅は CAREER と TECH STACK と同じ section-row が持つ。行の骨格を揃える */}
-      <ul>
+      <ul role="list">
         {posts.map((post) => {
           const { Icon, icon } = SITES[post.site]
           return (

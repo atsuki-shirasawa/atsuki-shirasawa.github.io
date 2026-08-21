@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -33,11 +34,13 @@ export function useDayTooltip(cells: (ContributionDay | null)[], latest: number)
   /** キーを押しっぱなしにされても取りこぼさないよう、今いるマスは ref でも持つ */
   const activeRef = useRef<number | null>(null)
 
-  const hide = () => {
+  // 触るのは ref と setState だけなので依存は空でよい。安定させておくと、
+  // 下の effect が「見えている hide」を依存に載せられる
+  const hide = useCallback(() => {
     stuck.current = false
     activeRef.current = null
     setTip(null)
-  }
+  }, [])
 
   // 指で出した吹き出しは、ヒートマップの外を押したら引っ込める
   useEffect(() => {
@@ -47,7 +50,7 @@ export function useDayTooltip(cells: (ContributionDay | null)[], latest: number)
     }
     document.addEventListener('pointerdown', onDocumentDown)
     return () => document.removeEventListener('pointerdown', onDocumentDown)
-  }, [tip])
+  }, [tip, hide])
 
   /** マスの数字を出す。位置はカード内の座標に直して持つ */
   const showFor = (cell: HTMLElement) => {

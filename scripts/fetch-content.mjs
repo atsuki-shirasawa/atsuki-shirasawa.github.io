@@ -20,6 +20,12 @@ const WEEKS = 53
 const log = (...args) => console.log('[fetch-content]', ...args)
 const warn = (...args) => console.warn('[fetch-content] ⚠', ...args)
 
+/** 取得の失敗はビルドを落とさない。何が落ちたかだけ言って null を返す */
+const warnAndSkip = (label) => (error) => {
+  warn(`${label}:`, error.message)
+  return null
+}
+
 /** コミット済みの内容（取得失敗時のフォールバック） */
 function readPrevious() {
   try {
@@ -210,10 +216,10 @@ async function main() {
   const prev = readPrevious()
 
   const [zenn, qiita, profile, contributions] = await Promise.all([
-    fetchZennPosts().catch((e) => (warn('Zenn:', e.message), null)),
-    fetchQiitaPosts().catch((e) => (warn('Qiita:', e.message), null)),
-    fetchGitHubProfile().catch((e) => (warn('GitHub profile:', e.message), null)),
-    fetchContributions().catch((e) => (warn('GitHub contributions:', e.message), null)),
+    fetchZennPosts().catch(warnAndSkip('Zenn')),
+    fetchQiitaPosts().catch(warnAndSkip('Qiita')),
+    fetchGitHubProfile().catch(warnAndSkip('GitHub profile')),
+    fetchContributions().catch(warnAndSkip('GitHub contributions')),
   ])
 
   let posts

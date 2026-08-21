@@ -1,8 +1,8 @@
 # atsukish-portfolio
 
 React 19 + Vite 8 + TypeScript の静的ポートフォリオ。GitHub Pages のユーザーサイト
-（https://atsuki-shirasawa.github.io/）に配信している。テストとリンタは無い。
-品質の門は `tsc -b` だけ。
+（https://atsuki-shirasawa.github.io/）に配信している。テストは無い。
+品質の門は **`biome lint` と `tsc -b`** の 2 枚（どちらも `npm run build` が通る）。
 
 ## コマンド
 
@@ -10,12 +10,35 @@ React 19 + Vite 8 + TypeScript の静的ポートフォリオ。GitHub Pages の
 npm run dev            # decks をビルドしてから開発サーバー
 npm run decks          # decks/ を正規化（Marp → PDF → ページ画像 → 本文抽出）
 npm run fetch:content  # Zenn / Qiita / GitHub を取り直して src/data/generated.json を更新
+npm run lint           # biome lint
 npm run typecheck      # tsc -b --noEmit
-npm run build          # decks + fetch:content + tsc -b + vite build
-npm run build:only     # 外部取得を飛ばして型チェックと vite build のみ
+npm run build          # decks + fetch:content + biome lint + tsc -b + vite build
+npm run build:only     # 外部取得を飛ばして lint・型チェック・vite build のみ
 
 node scripts/build-decks.mjs --force   # キャッシュを無視して全デッキ再生成
 ```
+
+## 検査の 2 枚
+
+**`tsc -b`（`src/` だけ）。** `noUncheckedIndexedAccess` を入れてある。添字と
+`Map.get` に `undefined` が付くので、`src/lib/` の集計は「空でも落ちない」形で
+書く（`ordered[0]?.from ?? end` のように）。`!` は置かない — biome が止める。
+
+**`biome lint`（`src/` と `scripts/` の両方）。** 設定は `biome.jsonc`。
+`scripts/` は tsconfig の include の外なので、ここが唯一の網になる。
+
+- **整形は入れていない**（`formatter.enabled: false`）。家の作法に合わせて掛けると
+  14 ファイルが動き、marp の argv が 9 行に展開されるなど可読性が下がる方向の差が
+  混ざる。入れるなら一度に全ファイルへ
+- `a11y/noRedundantRoles` は切ってある。Tailwind の preflight が全リストに
+  `list-style: none` を敷き、WebKit はそれでリストのロールを落とす（Safari +
+  VoiceOver で「N 項目」が読まれない）ので、`<ul role="list">` は冗長ではない
+- 抑制は `// biome-ignore <rule>: <理由>` を**診断が指す行の直前**に置く。
+  JSX では属性の直前（開始タグの中）に書く — **子要素の位置に `//` を置くと
+  コメントではなく可視テキストになる**（一度やった）
+- `typescript-eslint` は使えない。peer が `typescript <6.1.0` で、このリポジトリは
+  7 系。パーサが実行時に停止する（`typescript-eslint#10940`）。biome は独自パーサ
+  なので影響を受けず、`.tsx` の `useExhaustiveDependencies` まで見られる
 
 ## 生成物は直接編集しない
 
@@ -111,6 +134,33 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 - 静的ファイルの URL は文字列で組み立てず `src/lib/paths.ts` の `withBase()` を通す。
   プロジェクトサイトへ移したとき（`BASE_PATH=/<repo>/`）に壊れる
 - ルーティングはハッシュ（`/#/slides/<slug>`）。Pages に SPA フォールバックが無いため
+- スライドのキーボード操作は `document` で受けるが、**奪うキーは選ぶ**。`←` `→` と
+  `F` は常に効かせ、`Space` / `PageUp` / `PageDown` / `Home` / `End` は全画面のときだけ
+  （通常表示のデッキ詳細は下に本文が続くので、奪うとキーボードで読み進められない）
+- 検索用テキストの上限は `OUTPUT_CONFIG.searchTextLimit`。超えたら
+  `[decks] ⚠` が出る（黙って後半が検索から消えないように）
+
+## pdf.js は黙って形が変わる
+
+ビューアは `pdfjs-dist` を直接触る唯一の場所。**自前の構造型に寄せない** —
+`import type { PDFDocumentProxy, PDFPageProxy, PageViewport } from 'pdfjs-dist'`
+を使う（`import type` は消えるので、pdf.js が先読みで束ねられることはない）。
+
+自前の型に寄せていたころ、6 系への変更を 2 つ取りこぼしていた。どちらも
+例外にならず、静かに効かなくなるだけだった:
+
+- **`PDFDocumentProxy.destroy` が消えた。** `void doc?.destroy?.()` は optional call
+  なので no-op になり、デッキを離れてもワーカーとドキュメントが残っていた。
+  捨てるのは `getDocument()` が返す**読み込みタスク側**（`render.mjs` は対応済みで、
+  ブラウザ側だけ取り残されていた）
+- **`isEvalSupported` が消えた。** 渡しても無視される。両バンドルに 1 件も無い
+
+`rawDims` は公開型にあるが `Object` なので、要る 4 つを名指しした型で受ける。
+`page.render()` の `canvas` は必須項目。
+
+pdf.js の描画は `requestAnimationFrame` を回す。**不可視タブでは完了しない**ので、
+自動化した Chrome で「`data-state` が `ready` にならない」のはバグではない
+（`document.visibilityState` を先に見る）。
 
 ## 依存関係
 

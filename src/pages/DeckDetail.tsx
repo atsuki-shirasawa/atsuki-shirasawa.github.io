@@ -155,7 +155,13 @@ export default function DeckDetail() {
         <Link to="/slides">← Slides</Link>
       </p>
 
-      <Stage deck={deck} view={view} page={page} onPageChange={goToPage} />
+      {/*
+        デッキが変わったら主役は作り直す。同じ位置の同じ型なので React は
+        中身（VideoEmbed の再生中フラグ、YouTubeThumb のサムネイル URL、
+        ビューアの初期ページ）を使い回してしまう — 前のデッキの動画が
+        いきなり再生されたり、別のデッキのサムネイルが残る。
+      */}
+      <Stage key={deck.slug} deck={deck} view={view} page={page} onPageChange={goToPage} />
 
       <div className="mt-8 grid grid-cols-[minmax(0,1fr)_240px] gap-10 border-t border-t-line py-10 max-wide:grid-cols-1 max-wide:gap-7">
         <div className="flex flex-col gap-3.5">
@@ -186,7 +192,7 @@ export default function DeckDetail() {
           {deck.links.length > 0 && (
             <div className="mt-2.5 flex flex-col gap-2">
               <p className="font-mono text-meta tracking-caps text-faint">LINKS</p>
-              <ul className="flex flex-col gap-1.5 text-body">
+              <ul className="flex flex-col gap-1.5 text-body" role="list">
                 {deck.links.map((link) => (
                   <li key={link.url}>
                     <ExternalLink href={link.url}>{link.label} ↗</ExternalLink>

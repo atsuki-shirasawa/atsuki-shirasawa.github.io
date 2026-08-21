@@ -79,9 +79,14 @@ export default function GitHubActivity() {
                 className="font-mono grid w-full auto-cols-[minmax(10px,1fr)] grid-flow-col gap-0.75"
                 aria-hidden="true"
               >
+                {/*
+                  列（週）そのものが同一性。月名は空文字も重複もあり得るので鍵に使えず、
+                  53 週の並びは並べ替わらない
+                */}
                 {months.map((month, index) => (
                   <span
                     className="text-micro leading-none whitespace-nowrap text-faint"
+                    // biome-ignore lint/suspicious/noArrayIndexKey: 週の位置が同一性。月名は空文字も重複もあり得るので鍵に使えない
                     key={`${month}-${index}`}
                   >
                     {month}
@@ -93,6 +98,7 @@ export default function GitHubActivity() {
                 className="grid w-full auto-cols-[minmax(10px,1fr)] grid-flow-col grid-rows-[repeat(7,auto)] gap-0.75"
                 role="img"
                 aria-label={`Heatmap of ${formatCount(github.totalContributions)} contributions in the last year. Use the arrow keys to read one day at a time.`}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: 矢印キーで 1 日ずつ読ませる。その操作は上の aria-label が言葉で伝えている
                 tabIndex={0}
                 {...grid}
               >
@@ -109,6 +115,7 @@ export default function GitHubActivity() {
                       data-index={index}
                     />
                   ) : (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: 日付が無いマスなので添字しか同一性がない
                     <span key={`empty-${index}`} className={`${CELL} bg-transparent`} />
                   ),
                 )}

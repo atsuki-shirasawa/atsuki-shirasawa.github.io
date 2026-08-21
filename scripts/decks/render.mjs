@@ -8,6 +8,7 @@ import sharp from 'sharp'
 import { createCanvas, DOMMatrix, ImageData, Path2D } from '@napi-rs/canvas'
 
 import { OUTPUT_CONFIG, PDFJS_DIR } from './config.mjs'
+import { warn } from './util.mjs'
 
 // pdfjs reaches for DOM classes Node lacks, so hand it the canvas implementations first
 globalThis.DOMMatrix ??= DOMMatrix
@@ -33,7 +34,6 @@ export async function renderPdf(pdfPath, outDir, coverOnly = false) {
     standardFontDataUrl: path.join(PDFJS_DIR, 'standard_fonts') + path.sep,
     cMapUrl: path.join(PDFJS_DIR, 'cmaps') + path.sep,
     cMapPacked: true,
-    isEvalSupported: false,
   })
   const doc = await loadingTask.promise
   const pageCount = doc.numPages
@@ -77,7 +77,17 @@ export async function renderPdf(pdfPath, outDir, coverOnly = false) {
   }
 
   await loadingTask.destroy()
-  return { pageCount, aspect: Number(aspect.toFixed(4)), text: squash(texts.join('\n')) }
+
+  // 黙って切らない。切れた回は「後半が検索に出ない」ので、必ず声に出す
+  const full = squash(texts.join('\n'))
+  const limit = OUTPUT_CONFIG.searchTextLimit
+  if (full.length > limit) {
+    warn(
+      `${path.basename(outDir)}: 検索用テキストが ${full.length} 字あったので ${limit} 字で切った（以降のページは全文検索に載らない）`,
+    )
+  }
+
+  return { pageCount, aspect: Number(aspect.toFixed(4)), text: full.slice(0, limit) }
 }
 
 /**
@@ -94,7 +104,7 @@ function joinTextItems(items) {
   return out
 }
 
-/** Collapse whitespace for the search index */
+/** Collapse whitespace for the search index. 上限は呼ぶ側が OUTPUT_CONFIG から当てる */
 function squash(text) {
-  return text.replace(/\s+/g, ' ').trim().slice(0, 20000)
+  return text.replace(/\s+/g, ' ').trim()
 }

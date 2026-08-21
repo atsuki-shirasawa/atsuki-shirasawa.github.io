@@ -1,0 +1,22 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
+  "files": {
+    "includes": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.mjs", "vite.config.ts"]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "a11y": {
+        // CSS を見られないルール。Tailwind の preflight が全リストに
+        // list-style: none を敷いていて、WebKit はそれでリストのロールを落とす
+        // （Safari + VoiceOver で「N 項目」が読まれない）。role="list" は冗長ではない
+        "noRedundantRoles": "off"
+      }
+    }
+  },
+  // 整形は入れていない。入れるなら家の作法（セミコロンなし・シングルクォート・
+  // 2 スペース）に合わせた上で、全ファイルに一度掛ける覚悟が要る
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false }
+}

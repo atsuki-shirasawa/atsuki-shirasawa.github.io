@@ -17,6 +17,9 @@ const MONTH_NAMES = [
   'Dec',
 ]
 
+/** 月番号（1〜12）から名前。範囲外は空にして 'undefined' を出さない */
+const monthName = (month: number) => MONTH_NAMES[month - 1] ?? ''
+
 const numberFormat = new Intl.NumberFormat('en-US')
 
 export const formatCount = (value: number) => numberFormat.format(value)
@@ -70,7 +73,8 @@ export function longestStreak(days: ContributionDay[]): number {
 export function currentStreak(days: ContributionDay[]): number {
   let streak = 0
   for (let index = days.length - 1; index >= 0; index -= 1) {
-    if (days[index].c > 0) streak += 1
+    const day = days[index]
+    if (day && day.c > 0) streak += 1
     else if (index !== days.length - 1) break
   }
   return streak
@@ -83,14 +87,14 @@ export function currentStreak(days: ContributionDay[]): number {
 function monthLabels(weeks: (ContributionDay | null)[][]): string[] {
   return weeks.map((week) => {
     const opener = week.find((day) => day && parseDay(day.d).dayOfMonth === 1)
-    return opener ? MONTH_NAMES[parseDay(opener.d).month - 1] : ''
+    return opener ? monthName(parseDay(opener.d).month) : ''
   })
 }
 
 /** ツールチップの文言。2026-08-20 → 7 contributions · Aug 20, 2026 */
 export function dayLabel(day: ContributionDay): string {
   const { year, month, dayOfMonth } = parseDay(day.d)
-  const date = `${MONTH_NAMES[month - 1]} ${dayOfMonth}, ${year}`
+  const date = `${monthName(month)} ${dayOfMonth}, ${year}`
   if (day.c === 0) return `No contributions · ${date}`
   return `${formatCount(day.c)} contribution${day.c === 1 ? '' : 's'} · ${date}`
 }

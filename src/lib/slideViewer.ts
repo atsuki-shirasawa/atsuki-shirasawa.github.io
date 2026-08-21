@@ -8,6 +8,13 @@
  */
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { clampPage } from './page'
+// 型だけを取る（import type は消えるので、pdf.js が先読みで束ねられることはない）。
+// 自前の構造型に寄せていたころ、pdf.js 6 で PDFDocumentProxy.destroy が消えたのに
+// `doc?.destroy?.()` が黙って何もしなくなっていた事故がある。
+import type { PDFDocumentProxy, PDFPageProxy, PageViewport } from 'pdfjs-dist'
+
+type Pdfjs = typeof import('pdfjs-dist')
+type LoadingTask = ReturnType<Pdfjs['getDocument']>
 
 /** Retina までは払う価値がある。それ以上はファイルサイズが増えるだけで見た目は変わらない */
 const MAX_DPR = 2
@@ -20,17 +27,8 @@ const CACHE_PIXELS = 24_000_000
 export type ViewerState = 'loading' | 'ready' | 'failed'
 
 type Shot = { canvas: HTMLCanvasElement; key: string; width: number; height: number; scale: number }
+/** pdf.js は rawDims を Object として型付けしているので、要る 4 つだけを名指しする */
 type RawDims = { pageWidth: number; pageHeight: number; pageX: number; pageY: number }
-type Viewport = { width: number; height: number; rawDims: RawDims }
-type Page = {
-  /** PDF 自身の座標系 [x0, y0, x1, y1] */
-  view: number[]
-  getViewport(options: { scale: number }): Viewport
-  render(options: object): { promise: Promise<void>; cancel(): void }
-  streamTextContent(): ReadableStream
-  getAnnotations(options: { intent: string }): Promise<any[]>
-  cleanup(): void
-}
 type Draw = { key: string; cancelled: boolean; cancel(): void; promise: Promise<Shot | null> }
 
 export type SlideViewerOptions = {
@@ -63,12 +61,14 @@ export type SlideViewerHandle = {
 export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandle {
   const { stage, box, canvas, textLayer, linkLayer, poster, total } = options
 
-  let pdfjs: any = null
-  let doc: any = null
+  let pdfjs: Pdfjs | null = null
+  let doc: PDFDocumentProxy | null = null
+  /** 後片付けはこちらを捨てる。PDFDocumentProxy には destroy が無い（pdf.js 6 で消えた） */
+  let loadingTask: LoadingTask | null = null
   /** ページを移るたびに増える。古い番号を持って戻ってきたものは捨てる */
   let token = 0
   let current = clampPage(options.initialPage, total)
-  let lastPage: Page | null = null
+  let lastPage: PDFPageProxy | null = null
   let disposed = false
   const cache = new Map<number, Shot>()
   const inflight = new Map<number, Draw>()
@@ -82,7 +82,7 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
   }
 
   /** ステージのどこに、どれだけの精細さで描くか */
-  const plan = (unscaled: Viewport) => {
+  const plan = (unscaled: PageViewport) => {
     const stageWidth = stage.clientWidth || 1
     const stageHeight = stage.clientHeight || 1
     const aspect = unscaled.width / unscaled.height
@@ -106,7 +106,7 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
    * 1 ページにつき同時に走る描画は 1 本だけ。先読みしているページに移動するのは
    * 日常茶飯事で、そこで 2 本目を始めると 1 本目が無駄になる。後から来た方が待つ。
    */
-  const draw = (pageNumber: number, page: Page, p: Plan): Promise<Shot | null> => {
+  const draw = (pageNumber: number, page: PDFPageProxy, p: Plan): Promise<Shot | null> => {
     const running = inflight.get(pageNumber)
     if (running) {
       if (running.key === p.key && !running.cancelled) return running.promise
@@ -126,7 +126,9 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
     context.fillStyle = '#ffffff'
     context.fillRect(0, 0, offscreen.width, offscreen.height)
 
-    const task = page.render({ canvasContext: context, viewport })
+    // canvas は必須項目。pdf.js は渡された canvas から自分で 2d を取り直すが、
+    // 同じ canvas の getContext は最初に作った文脈を返すので、上の白地は残る
+    const task = page.render({ canvas: offscreen, viewport })
     const entry: Draw = {
       key: p.key,
       cancelled: false,
@@ -156,10 +158,9 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
     cache.set(page, shot)
     let pixels = 0
     for (const entry of cache.values()) pixels += entry.canvas.width * entry.canvas.height
-    for (const key of [...cache.keys()]) {
+    for (const [key, entry] of [...cache.entries()]) {
       if (cache.size <= 1 || (cache.size <= CACHE_ENTRIES && pixels <= CACHE_PIXELS)) break
       if (key === current || key === page) continue
-      const entry = cache.get(key)!
       pixels -= entry.canvas.width * entry.canvas.height
       entry.canvas.width = entry.canvas.height = 0 // GC 待ちにせず、いま解放する
       cache.delete(key)
@@ -196,7 +197,8 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
     box.style.setProperty('--total-scale-factor', String(p.scale))
   }
 
-  const paintText = async (page: Page, scale: number, mine: number) => {
+  const paintText = async (page: PDFPageProxy, scale: number, mine: number) => {
+    if (!pdfjs) return
     textLayer.replaceChildren()
     const layer = new pdfjs.TextLayer({
       textContentSource: page.streamTextContent(),
@@ -217,7 +219,8 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
    * PDF が持つリンクを組み直す。pdf.js は安全と判断したプロトコルにしか url を
    * 入れないので、妙なものはそもそもリンクにならない。
    */
-  const paintLinks = async (page: Page, unscaled: Viewport, mine: number) => {
+  const paintLinks = async (page: PDFPageProxy, unscaled: PageViewport, mine: number) => {
+    if (!pdfjs) return
     linkLayer.replaceChildren()
     const annotations = await page.getAnnotations({ intent: 'display' })
     if (mine !== token) return
@@ -244,13 +247,14 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
 
       // PDF の座標はページ下端から上向き。いったんページ内に反転してから、
       // ページに対する割合で表す。pdf.js 自身の注釈レイヤーと同じ計算。
-      const { pageWidth, pageHeight, pageX, pageY } = unscaled.rawDims
-      const view = page.view
-      const [left, top, right, bottom] = pdfjs.Util.normalizeRect([
+      const { pageWidth, pageHeight, pageX, pageY } = unscaled.rawDims as RawDims
+      // PDF の view は [x0, y0, x1, y1]
+      const [, y0 = 0, , y1 = 0] = page.view
+      const [left = 0, top = 0, right = 0, bottom = 0] = pdfjs.Util.normalizeRect([
         annotation.rect[0],
-        view[3] - annotation.rect[1] + view[1],
+        y1 - annotation.rect[1] + y0,
         annotation.rect[2],
-        view[3] - annotation.rect[3] + view[1],
+        y1 - annotation.rect[3] + y0,
       ])
       element.style.left = `${((left - pageX) / pageWidth) * 100}%`
       element.style.top = `${((top - pageY) / pageHeight) * 100}%`
@@ -263,6 +267,7 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
 
   /** デッキ内を指すリンク。行き先はページ番号ではなくページオブジェクト */
   const jumpTo = async (dest: unknown) => {
+    if (!doc) return
     try {
       const resolved = typeof dest === 'string' ? await doc.getDestination(dest) : dest
       if (!Array.isArray(resolved)) return
@@ -289,7 +294,7 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
       if (Math.abs(number - current) > 1) entry.cancel()
     }
 
-    let page: Page
+    let page: PDFPageProxy
     try {
       page = await doc.getPage(current)
     } catch {
@@ -320,7 +325,7 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
   const ahead = async (pageNumber: number) => {
     if (!doc || disposed || pageNumber < 1 || pageNumber > total) return
     try {
-      const page: Page = await doc.getPage(pageNumber)
+      const page = await doc.getPage(pageNumber)
       const p = plan(page.getViewport({ scale: 1 }))
       if (cache.get(pageNumber)?.key === p.key) return
       const shot = await draw(pageNumber, page, p)
@@ -335,12 +340,13 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
     try {
       pdfjs = await import('pdfjs-dist')
       pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
-      const loadingTask = pdfjs.getDocument({
+      // isEvalSupported は渡さない。pdf.js 6 で消えた項目なので、書いても
+      // 黙って無視される（実型に載せ替えたときに気づいた）
+      loadingTask = pdfjs.getDocument({
         url: options.pdfUrl,
         cMapUrl: options.cMapUrl,
         cMapPacked: true,
         standardFontDataUrl: options.fontUrl,
-        isEvalSupported: false,
       })
       doc = await loadingTask.promise
       if (disposed) {
@@ -360,7 +366,9 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
   // 監視を始めた瞬間に初回描画と二重に走ることはない。
   let settle: ReturnType<typeof setTimeout>
   let seen = `${Math.round(stage.clientWidth)}x${Math.round(stage.clientHeight)}`
-  const observer = new ResizeObserver(([entry]) => {
+  const observer = new ResizeObserver((entries) => {
+    const entry = entries[0]
+    if (!entry) return
     const size = `${Math.round(entry.contentRect.width)}x${Math.round(entry.contentRect.height)}`
     if (size === seen) return
     seen = size
@@ -384,7 +392,10 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
       for (const entry of inflight.values()) entry.cancel()
       forget()
       lastPage = null
-      void doc?.destroy?.()
+      // PDFDocumentProxy に destroy は無い（pdf.js 6 で消えた）。読み込みタスクを
+      // 捨てないと、デッキを離れてもワーカーとドキュメントが残る
+      void loadingTask?.destroy()
+      loadingTask = null
       doc = null
     },
   }

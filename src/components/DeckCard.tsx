@@ -72,8 +72,13 @@ export default function DeckCard({ deck, eager = false, onTagClick }: Props) {
 
           {!lead && (
             <p className={COUNT}>
+              {/*
+                単位は opacity で落とさない。地はスライドの絵なので比が保証できず、
+                白いスライドの上では 2.79:1 だった（数字本体は 4.70:1）。
+                --color-on-media のまま置く
+              */}
               {deck.pageCount}
-              <span className="pl-0.5 opacity-60">p</span>
+              <span className="pl-0.5">p</span>
             </p>
           )}
         </div>

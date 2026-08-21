@@ -7,10 +7,11 @@
     "dev": "npm run decks && vite",
     "decks": "node scripts/build-decks.mjs",
     "fetch:content": "node scripts/fetch-content.mjs",
-    "build": "npm run decks && npm run fetch:content && tsc -b && vite build",
-    "build:only": "tsc -b && vite build",
+    "build": "npm run decks && npm run fetch:content && biome lint && tsc -b && vite build",
+    "build:only": "biome lint && tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "lint": "biome lint"
   },
   "dependencies": {
     "pdfjs-dist": "^6.2.108",
@@ -19,6 +20,7 @@
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.9",
     "@marp-team/marp-cli": "^4.5.0",
     "@napi-rs/canvas": "^1.0.7",
     "@tailwindcss/vite": "^4.3.3",

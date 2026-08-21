@@ -35,6 +35,11 @@ export const OUTPUT_CONFIG = {
   posterWidth: 1600,
   /** フィルムストリップとカードのめくりプレビュー */
   thumbWidth: 480,
+  /**
+   * 1 デッキぶんの検索用テキストの上限。ここを超えたぶんは全文検索に載らない
+   * （越えたら build-decks が警告する）。出力を左右するので必ずここに置く
+   */
+  searchTextLimit: 20000,
 }
 
 /**

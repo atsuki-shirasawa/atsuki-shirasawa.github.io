@@ -161,7 +161,7 @@
   backdrop-filter: blur(8px);
   color: var(--color-on-media);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-note);
   letter-spacing: 0.04em;
   animation: note-in 0.25s ease 0.6s both;
 }
@@ -223,7 +223,12 @@
   right: 14px;
 }
 
-.stage:hover .nav,
+/*
+ * :not(:disabled) が要る。下の .nav:disabled は (0,2,0) しかないので、
+ * .stage:hover .nav (0,3,0) に詳細度で負け、1 ページ目でも「前へ」が
+ * 出ていた（押せないのに押せるように見える）。
+ */
+.stage:hover .nav:not(:disabled),
 .nav:focus-visible {
   opacity: 1;
 }
@@ -251,14 +256,14 @@
   border-radius: 999px;
   background: var(--chipbg);
   color: var(--chipfg);
-  font-size: 13px;
+  font-size: var(--text-label);
   letter-spacing: 0.06em;
 }
 
 .hint {
   margin-right: auto;
   color: var(--faint);
-  font-size: 12px;
+  font-size: var(--text-note);
   letter-spacing: 0.04em;
 }
 
@@ -269,7 +274,7 @@
   background: var(--surface);
   color: var(--fg);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--text-label);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -316,7 +321,6 @@
   overflow: hidden;
   transition:
     box-shadow 0.2s,
-    opacity 0.2s,
     translate 0.2s;
 }
 
@@ -324,20 +328,30 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity 0.2s;
 }
 
-.stripButton[aria-current='false'] {
+/*
+ * 落とすのは絵だけ。ボタンごと opacity で落とすと中の .stripNum も一緒に薄まり、
+ * 11px の白文字が light で 2.65〜3.55:1、dark でも白いスライドなら 4.12:1 だった
+ * （どのスライド地でも 4.5:1 に届かない組み合わせがある）。絵に限れば番号は
+ * ガラスの上の白のままで 10:1 を超える。
+ */
+.stripButton[aria-current='false'] img {
   opacity: 0.5;
 }
 
-.stripButton:hover {
+/* 同じ詳細度なので、勝たせたい側を後ろに置く */
+.stripButton:hover img {
   opacity: 1;
+}
+
+.stripButton:hover {
   translate: 0 -2px;
 }
 
 .stripButton[aria-current='true'] {
   box-shadow: 0 0 0 2px var(--accent);
-  opacity: 1;
 }
 
 .stripNum {
@@ -348,7 +362,7 @@
   background: var(--color-glass-strong);
   backdrop-filter: blur(8px);
   color: var(--color-on-media);
-  font-size: 11px;
+  font-size: var(--text-meta);
   line-height: 1;
 }
 

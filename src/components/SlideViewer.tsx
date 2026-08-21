@@ -50,6 +50,17 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
   const turn = useCallback((direction: 1 | -1) => go(page + direction), [go, page])
   const toggleFullscreen = useFullscreen(stageRef)
 
+  /*
+   * PDF 内リンクの飛び先。エンジンの組み立ては下の effect が持つが、その依存に go を
+   * 置くとページを送るたびにエンジンごと作り直される（go は現在ページを閉じ込めて
+   * いるので必ず作り直される）。実測でページ送り 1 回ごとに pdf.worker と
+   * slides.pdf を取り直し、先読みしたページも全部捨てていた。ref 越しに渡す。
+   */
+  const goRef = useRef(go)
+  useEffect(() => {
+    goRef.current = go
+  }, [go])
+
   useSlideKeys({ page, total, go, onToggleFullscreen: toggleFullscreen })
   useSwipe(stageRef, turn)
 
@@ -78,7 +89,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
       posterSrc: posterImage(deck.slug),
       initialPage: initialPageRef.current,
       onState: setState,
-      onNavigate: go,
+      onNavigate: (target: number) => goRef.current(target),
     })
     viewerRef.current = viewer
 
@@ -86,7 +97,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
       viewer.destroy()
       viewerRef.current = null
     }
-  }, [deck.slug, deck.pageCount, go])
+  }, [deck.slug, deck.pageCount])
 
   // 現在ページが動いたら描き直しを頼み、フィルムストリップを追従させる
   useEffect(() => {
@@ -163,7 +174,7 @@ export default function SlideViewer({ deck, page, onPageChange }: Props) {
         </button>
       </div>
 
-      <ol className={styles.strip} ref={stripRef} aria-label="All pages">
+      <ol className={styles.strip} ref={stripRef} role="list" aria-label="All pages">
         {Array.from({ length: total }, (_, index) => index + 1).map((number) => (
           <li className={styles.stripItem} key={number}>
             <button

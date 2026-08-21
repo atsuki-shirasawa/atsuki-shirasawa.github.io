@@ -49,18 +49,20 @@ export type CareerTrack = {
 /** Hero のトラック。古い順に並べ直して左から右へ引く */
 export function careerTrack(): CareerTrack {
   const ordered = [...career].sort((a, b) => a.from - b.from)
-  const start = ordered[0].from
   const end = currentYear
+  // career が空でも落とさない。1 点だけのトラックとして退化させる
+  const start = ordered[0]?.from ?? end
   const span = Math.max(end - start, 1)
   const at = (year: number) => ((year - start) / span) * 100
   // 在職中の職を「今」の区間とする。そこから右が実線になる
   const present = ordered.find((entry) => entry.to === null) ?? ordered[ordered.length - 1]
+  const turnYear = present?.from ?? start
 
   return {
     start,
     end,
-    turnYear: present.from,
-    turn: at(present.from),
+    turnYear,
+    turn: at(turnYear),
     ticks: [...ordered.map((entry) => entry.from), end],
     at,
   }

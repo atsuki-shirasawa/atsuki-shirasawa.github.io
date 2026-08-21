@@ -68,6 +68,7 @@ export default function Carousel({ name, children }: Props) {
 
       {/* 溢れているときだけフォーカスできるようにして、矢印キーでも送れるようにする */}
       <ul
+        role="list"
         className={styles.track}
         ref={railRef}
         onScroll={measure}

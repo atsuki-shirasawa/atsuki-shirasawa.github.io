@@ -64,6 +64,8 @@ export async function marpToPdf(deck, pdfOut) {
     const detail = [error.stderr, error.stdout, error.message].filter(Boolean).join('\n').trim()
     throw new Error(
       `${deck.slug}: Marp could not write the PDF. Chrome or Chromium is required (point CHROME_PATH at it).\n${detail}`,
+      // 読ませるのは detail だが、元の例外も繋いでおく（終了コードやシグナルはそこにしか無い）
+      { cause: error },
     )
   } finally {
     await fs.rm(tmpPath, { force: true })
