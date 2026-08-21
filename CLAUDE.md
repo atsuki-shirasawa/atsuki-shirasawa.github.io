@@ -65,6 +65,14 @@ npx vitest                             # 監視モード
 再現しない。代わりが下の 2 つ — `npm run decks:examples`（出力の中身を見る）と、
 自前のスライドを足した回にブラウザで開くこと。
 
+**静的データからの導出はモジュール定数に畳む。** 入力が `profile.ts` /
+`decks.json` / `generated.json` / `currentYear` のどれかなら、値はビルド時に決まる。
+`useMemo(…, [])` は依存配列が空になるだけで何も守らないので、`useMemo` でも
+毎レンダーでもなく **1 度だけ評価した値を `src/data/` から export する**
+（`deckTags` / `calendar` / `legs` / `track`）。関数は `src/lib/` に残す。
+鍵を取る導出（`deckBySlug` / `deckNeighbours` / `deckView`）は畳めないので関数のまま
+— Map にすると findIndex の代わりにキャッシュを持つことになる。
+
 **`careerLegs` / `careerTrack` は `entries` を受け取れる**（既定引数なので呼ぶ側は
 変わらない）。実データには無い並び — 同じ年に区間が 2 つ、現職の開始年が現在年 — を
 試すため。ここを注入できなかったせいで、目盛りの年が重複して React の key が衝突する
@@ -207,10 +215,18 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
   **代償は共有カードが 1 組しか持てないこと** — フラグメントはサーバーに届かないので、
   スクレイパが読むのは `index.html` だけ。デッキごとのカードを出すには、デッキごとの
   静的 HTML を焼いてハッシュをやめる（`404.html` の SPA フォールバック）必要がある
-- 共有カード（`og:*` / `twitter:card`）と `theme-color` は `index.html`。絶対 URL は
-  スクレイパが相対を拾わないので、`base` を持っている `vite.config.ts` が
-  `__SITE_URL__` / `__OG_IMAGE__` に入れる（`&` は実体参照にする）。
+- 共有カード（`og:*` / `twitter:card`）と `theme-color` は `index.html`。**文字列は
+  写さず `vite.config.ts` の `INJECT` が入れる** — `__SITE_URL__` `__OG_IMAGE__`
+  `__TITLE__` `__DESCRIPTION__` `__SITE_NAME__` `__IMAGE_ALT__` `__THEME_KEY__`
+  （`&` は実体参照にする）。URL は `base` を持っているのがここだけだから、
+  題と名前と鍵は 2 箇所に置くと片方だけ変わるから。とくに `__THEME_KEY__` は
+  `localStorage` の鍵で、食い違うと保存が読まれず**初回描画のテーマが黙って外れる**。
   `theme-color` は `useTheme` が実際の `--bg` を読んで書き換えるので、色をここに写さない
+- **`vite.config.ts` が読む src のファイルは import を持たせない。** vite の
+  native config loader は拡張子なしの import を解けないので、設定から辿る枝を
+  `src/data/identity.ts` と `src/lib/theme.ts` の 2 つで閉じて、拡張子付きで読む
+  （`tsconfig.node.json` の `allowImportingTsExtensions`）。`profile.ts` は
+  `identity` を spread するだけなので、読む側の書き方は変わらない
 - スライドのキーボード操作は `document` で受けるが、**奪うキーは選ぶ**。`←` `→` と
   `F` は常に効かせ、`Space` / `PageUp` / `PageDown` / `Home` / `End` は全画面のときだけ
   （通常表示のデッキ詳細は下に本文が続くので、奪うとキーボードで読み進められない）
@@ -302,7 +318,9 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
 - **行送りは字の大きさで決まる** — 読ませる字（16px 以下）は `leading-prose`(1.7)、
   見せる字は 17〜20px が `leading-lead`(1.55)、28px 以上が `leading-title`(1.4)。
   「字が大きくなるほど詰める」の 1 本しかないので、迷ったら大きさを見る
-- **総大文字の字送りは `tracking-caps`(0.1em) だけ**。段は作らない
+- **総大文字の字送りは `tracking-caps`(0.1em) だけ**。段は作らない。字面そのものは
+  `uppercase` に任せる — データ側に大文字で持つと Title Case の題と 2 通りになる
+  （`profile.role` で踏んだ）
 - 名前を付けるのは **2 箇所以上で同じ意味で使う値だけ**。1 箇所しかない光学的な
   微調整（ロゴの字送り、ツールチップの行送り）は arbitrary value でよい。
   ただし**なぜその値か**をコメントに残す
@@ -319,6 +337,10 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
   より常に強い。`a:hover { text-decoration: underline }` を素で書くと
   `hover:no-underline` が負ける。逆に、ページの骨格クラスはレイヤーに入れない
   （CSS Modules もレイヤー外なので、入れると module が必ず勝つようになる）
+- **打ち消しに `hover:` は要らない。** 上の裏返し。utility は `@layer utilities`
+  に出るので、詳細度に関係なく `@layer base` の `a:hover` に勝つ。
+  `text-fg hover:text-fg hover:no-underline` と 3 つ並べていたが、効いていたのは
+  最初の 1 つと下線消し 1 つだけだった。囲みごとリンクにする場所は `quiet-link`
 - **同じ詳細度の utility は class 属性の並びで決まらない。** 共通文字列に
   `text-muted` を置いて active 側で `text-fg` を足すのは効かない。勝つのは
   生成 CSS の並び。**状態ごとに書き切る**
@@ -354,7 +376,7 @@ arbitrary value には**なぜその値かを書く場所が無い**ので、1 �
 | ファイル | 移すと増える arbitrary |
 | --- | --- |
 | `SlideViewer.module.css` | そもそも移せない。pdf.js が実行時に作る DOM（`:global(.textLayer)`）に className を渡せない |
-| `CareerTrack.module.css` | 9 個。cubic-bezier 2 つ、`clip-path` 2 つ、`color-mix()` の破線色、点の `box-shadow`、字送り、レーンの位置（162px）と節目の高さ（23.5px）。ほぼ全部が 1 回きりの絶対配置 |
+| `CareerTrack.module.css` | 8 個。cubic-bezier 2 つ、`clip-path` 2 つ、`color-mix()` の破線色、点の `box-shadow`、字送り、節目の高さ（23.5px）。ほぼ全部が 1 回きりの絶対配置。レーンの位置だけは例外で、`section-row` と共有する必要があるので `--section-label` / `--section-gap` から `calc` で引く（計算済みの 162px を写していたころ、左列を変えると CAREER だけ取り残された） |
 | `Carousel.module.css` | 3 つ + 1 回しか使わない `@utility`（`::-webkit-scrollbar` に変種が無い）。レールの 12 宣言も他に出てこない |
 
 `CareerTrack.module.css` は **`CareerTrack.tsx` と `Career.tsx` の両方が import する**。
@@ -394,7 +416,9 @@ Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で�
 | やりたいこと | 通す場所 |
 | --- | --- |
 | デッキの見せ方で分岐する | `src/lib/deckView.ts` の `DeckView`。`format === 'video'` を直に見ない |
-| デッキへのリンクを置く | `<DeckLink deck>`（外か中かを判断する） |
+| デッキへのリンクを置く | `<DeckLink deck>`（外か中かを判断する。`view` を持っているなら渡す — 同じ判定と `new URL()` が 2 回走る） |
+| デッキの縦横比を style に載せる | `src/lib/deckView.ts` の `aspectStyle()` |
+| デッキのカードを置く | `<DeckCard deck heading>`（見出しの階層は**置いた側**が決める。`/slides` は h2、Home の TALKS の下は h3） |
 | 外部リンクを置く | `<ExternalLink>`（`target` / `rel` を書かない） |
 | タグのチップを置く | `<DeckTags>`、または `chip` |
 | 版面で囲む | `wrap`（`container` ではない — Tailwind の組み込みとぶつかる） |
@@ -409,11 +433,18 @@ Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で�
 | 指の当たり判定を広げる | `tap` |
 | 読み上げにだけ渡す | `visually-hidden` |
 | ページ番号を丸める | `src/lib/page.ts` の `clampPage` / `parsePageParam` |
+| 1..N のページを並べる | `src/lib/page.ts` の `pageRange()` |
+| 色も下線も要らないリンクを置く | `quiet-link`（`hover:` は要らない。上の「打ち消しに `hover:` は要らない」） |
 | 現在年を読む | `src/lib/time.ts` の `currentYear`（`new Date()` を書かない） |
 | タブの題を決める | `usePageTitle()`（ページで `useEffect` と `document.title` を書かない） |
-| 経歴から数や位置を出す | `src/lib/career.ts` の `careerLegs()` / `careerTrack()`。Hero のトラックと CAREER のレーンは同じ読みを共有する |
+| 経歴から数や位置を出す | 描く側は `src/data/career.ts` の `legs` / `track`（評価済み）。集計は `src/lib/career.ts` の `careerLegs()` / `careerTrack()`。Hero のトラックと CAREER のレーンは同じ読みを共有する |
+| ヒートマップの読みを引く | `src/data/content.ts` の `calendar`（`readCalendar()` を `.tsx` で呼ばない） |
+| 一覧のタグを引く | `src/data/decks.ts` の `deckTags`（すでに使用数の降順） |
+| 名前・肩書き・題を書く | `src/data/identity.ts`（`siteTitle` / `metaDescription` / `avatarAlt`）。`profile` はこれを spread している |
+| テーマの保存先を読む | `src/lib/theme.ts` の `THEME_STORAGE_KEY`（`index.html` と共有する） |
 | Zenn / Qiita の色とアイコンを引く | `src/components/sites.ts` の `SITES`（`text-zenn` や `ZennIcon` を直に書かない） |
 | 記事を新しい順に並べる | `src/data/content.ts` の `posts`（すでに降順。`.tsx` で sort しない） |
 | クエリを書き換える | `useQueryUpdate()`（常に `replace`） |
 | 静的ファイルの URL を作る | `src/lib/paths.ts` の `withBase()` |
 | 共有カードの絶対 URL を組む | `vite.config.ts`（`siteOrigin` + `base`）。`index.html` に URL を写さない |
+| デッキの `links:` の 1 件を型で受ける | `DeckResource`（コンポーネント `DeckLink` と衝突するので型を改名した。`careerTrack()` の戻りも同じ理由で `CareerTrackLayout`） |
