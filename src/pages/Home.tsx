@@ -15,10 +15,11 @@ export default function Home() {
     <div className="wrap">
       <Hero />
       <Career />
+      {/* 成果物を先に見せる。CAREER は Hero の道から地続きなので位置は動かさない */}
+      <Talks />
       <TechStack />
       <GitHubActivity />
       <Writing />
-      <Talks />
     </div>
   )
 }
