@@ -45,7 +45,9 @@ export default function Slides() {
             <div className="relative flex-[1_1_280px] max-w-[360px] max-narrow:max-w-none">
               <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 fill-none stroke-faint stroke-2" />
               <input
-                className="w-full rounded-lg border border-line bg-surface py-2.5 pr-3.5 pl-9 text-body text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+                // outline は base の :focus-visible に任せる。outline-none を置くと、残るのが
+                // 1px の枠線色だけになり、ページ中でここだけフォーカスが見えなくなる
+                className="w-full rounded-lg border border-line bg-surface py-2.5 pr-3.5 pl-9 text-body text-fg placeholder:text-faint focus:border-accent"
                 type="search"
                 value={query}
                 placeholder="Search titles, tags and slide text"
@@ -67,7 +69,12 @@ export default function Slides() {
                     }
                   >
                     {tag}
-                    <span className="opacity-55">{count}</span>
+                    {/*
+                      件数は opacity で落とせない。ホバー時はラベル自身が 4.96:1
+                      しかなく、そこから何 % 落としても 4.5:1 を割る（55% で 2.26:1）。
+                      状態で変わらない --muted に固定する（6 状態の最悪 4.76:1）。
+                    */}
+                    <span className="text-muted">{count}</span>
                   </button>
                 ))}
               </div>

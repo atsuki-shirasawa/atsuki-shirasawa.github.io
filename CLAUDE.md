@@ -194,6 +194,13 @@ Tailwind v4（`@tailwindcss/vite`）と CSS Modules の混成。**ファイル�
 - **入れ子の `color-mix()` は arbitrary value に書けない。** グラデーションの
   停止位置として解釈され、`16%` が落ちてべた塗りになる
   （`before:bg-[radial-gradient(...)]` で踏んだ）。`@utility` か module に出す
+- **`opacity` で文字を落とさない。** 状態で地色と文字色が変わる場所では比が保証
+  できない。Slides のタグの件数が `opacity-55` で 2.85:1 だった（light の rest）。
+  ホバー時はラベル自身が 4.96:1 しかないので、**何 % にしても 4.5:1 を割る**。
+  状態で変わらないトークンに固定する（`--muted` は 6 状態の最悪で 4.76:1、
+  `--faint` はチップの地では 3.71:1 で全滅）
+- **`focus:outline-none` を置かない。** utility は `@layer base` に勝つので、
+  `:focus-visible` の輪（2px の accent）が消えて枠線色の変化しか残らない
 - **辺を指定する。** `border-t border-line` は 4 辺に色を置く。`border-t-line`
 - **折り返し点の境界を混ぜない。** `max-width: 720px` はちょうど 720px を含み、
   `max-narrow`（`width < 45rem`）は含まない。CSS 側も `width < Nrem` で書く
