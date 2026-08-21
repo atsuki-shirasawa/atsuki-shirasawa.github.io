@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import DeckLink from '../components/DeckLink'
 import DeckTags from '../components/DeckTags'
@@ -6,6 +5,7 @@ import ExternalLink from '../components/ExternalLink'
 import SlideViewer from '../components/SlideViewer'
 import VideoEmbed from '../components/VideoEmbed'
 import { deckBySlug, deckNeighbours } from '../data/decks'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQueryUpdate } from '../hooks/useQueryUpdate'
 import { deckView, formatDeckDate, type DeckView } from '../lib/deckView'
 import { textLang } from '../lib/lang'
@@ -139,9 +139,7 @@ export default function DeckDetail() {
   const [params, update] = useQueryUpdate()
   const deck = deckBySlug(slug)
 
-  useEffect(() => {
-    if (deck) document.title = `${deck.title} — Slides`
-  }, [deck])
+  usePageTitle(deck ? `${deck.title} — Slides` : '')
 
   if (!deck) return <Navigate to="/slides" replace />
 

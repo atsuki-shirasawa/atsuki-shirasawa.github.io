@@ -11,10 +11,7 @@ export default function Talks() {
       <div className="section-head">
         <h2 className="section-title">TALKS</h2>
         <div className="section-links">
-          <Link
-            className="tap text-muted transition-colors hover:text-accent hover:no-underline"
-            to="/slides"
-          >
+          <Link className="tap text-muted hover:text-accent" to="/slides">
             All talks <span aria-hidden="true">→</span>
           </Link>
         </div>

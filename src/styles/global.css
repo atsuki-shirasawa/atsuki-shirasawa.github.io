@@ -186,6 +186,28 @@ html[data-theme='dark'] {
   font-size: var(--text-label);
 }
 
+/*
+ * 節見出しの右に並ぶリンク。箱（アイコンとの並べ方・間隔・折り返さない・遷移）は
+ * 容器が持つ。TALKS / WRITING / GITHUB ACTIVITY が同じ指定を写していた。
+ *
+ * 色はここに置けない。レイヤーの外の規則は utility より常に強いので、
+ * color を書くと各リンクの hover:text-accent / hover:text-zenn-fg が負ける。
+ * 文字色は rest も hover も utility 側に残す。下線消しだけは逆で、ここに置くと
+ * @layer base の a:hover に勝つので、リンクごとの hover:no-underline が要らない。
+ */
+.section-links > a {
+  display: inline-flex;
+  align-items: center;
+  /* 13px の svg と文字のあいだ */
+  gap: 7px;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.section-links > a:hover {
+  text-decoration: none;
+}
+
 @media (width < 45rem) {
   :root {
     --content-pad: 20px;

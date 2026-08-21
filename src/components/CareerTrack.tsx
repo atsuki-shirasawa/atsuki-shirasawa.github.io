@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { career } from '../data/profile'
-import { currentYear } from '../lib/time'
+import { careerTrack } from '../lib/career'
 import styles from './CareerTrack.module.css'
 
 /**
@@ -15,18 +14,8 @@ export default function CareerTrack() {
   const ref = useRef<HTMLDivElement>(null)
   const [drawn, setDrawn] = useState(false)
 
-  // 古い順に並べ直して左から右へ
-  const ordered = [...career].sort((a, b) => a.from - b.from)
-  const start = ordered[0].from
-  const end = currentYear
-  const span = Math.max(end - start, 1)
-  /** 年をトラック上の位置（%）に直す */
-  const at = (year: number) => ((year - start) / span) * 100
-
-  // 在職中の職を「今」の区間とする。そこから右が実線になる
-  const present = ordered.find((entry) => entry.to === null) ?? ordered[ordered.length - 1]
-  const turn = at(present.from)
-  const ticks = [...ordered.map((entry) => entry.from), end]
+  // 位置の計算は lib/career.ts。CAREER の縦レーンと同じ 1 つの読みから引く
+  const { start, turnYear, turn, ticks, at } = careerTrack()
 
   useEffect(() => {
     const node = ref.current
@@ -53,7 +42,7 @@ export default function CareerTrack() {
       ref={ref}
       data-drawn={drawn || undefined}
       role="img"
-      aria-label={`Career timeline: map data and computer vision from ${start} to ${present.from}, LLM agents from ${present.from} to now. The list below has the detail.`}
+      aria-label={`Career timeline: map data and computer vision from ${start} to ${turnYear}, LLM agents from ${turnYear} to now. The list below has the detail.`}
     >
       <div className={`font-mono ${styles.eras}`} aria-hidden="true">
         {/* 位置は custom property で渡す。狭い画面では凡例に落として無効化する */}

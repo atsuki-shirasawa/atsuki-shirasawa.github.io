@@ -3,7 +3,7 @@ import CareerTrack from './CareerTrack'
 import ExternalLink from './ExternalLink'
 import { github } from '../data/content'
 import { profile } from '../data/profile'
-import { QiitaIcon, ZennIcon } from './icons/BrandIcons'
+import { SITE_ORDER, SITES } from './sites'
 
 /** 3 つのボタンの共通の箱。padding は指で押せる 44px に乗せる高さ */
 const BUTTON =
@@ -55,21 +55,20 @@ export default function Hero() {
         <Link className={`${BUTTON} solid-accent border-accent hover:border-accent2`} to="/slides">
           Slides <span aria-hidden="true">→</span>
         </Link>
-        {/* 従の 2 つ。差はアイコンの色と、ホバー時の枠線・文字色だけ */}
-        <ExternalLink
-          className={`${BUTTON_OUTLINE} hover:border-zenn hover:text-zenn-fg`}
-          href={profile.links.zenn}
-        >
-          <ZennIcon size={15} className="shrink-0 text-zenn" />
-          Zenn
-        </ExternalLink>
-        <ExternalLink
-          className={`${BUTTON_OUTLINE} hover:border-qiita hover:text-qiita-fg`}
-          href={profile.links.qiita}
-        >
-          <QiitaIcon size={15} className="shrink-0 text-qiita" />
-          Qiita
-        </ExternalLink>
+        {/* 従の 2 つ。差はアイコンの色と、ホバー時の枠線・文字色だけなので表から引く */}
+        {SITE_ORDER.map((site) => {
+          const { Icon, url, icon, hover, hoverBorder } = SITES[site]
+          return (
+            <ExternalLink
+              className={`${BUTTON_OUTLINE} ${hoverBorder} ${hover}`}
+              href={url}
+              key={site}
+            >
+              <Icon size={15} className={`shrink-0 ${icon}`} />
+              {site}
+            </ExternalLink>
+          )
+        })}
       </div>
     </section>
   )

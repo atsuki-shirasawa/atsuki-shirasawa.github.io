@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import DeckCard from '../components/DeckCard'
 import { SearchIcon } from '../components/icons/UiIcons'
 import { decks, tagIndex } from '../data/decks'
 import { useDeckSearch } from '../hooks/useDeckSearch'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQueryUpdate } from '../hooks/useQueryUpdate'
 
 /** これを下回るあいだは検索とタグを畳んでおく */
@@ -13,9 +14,7 @@ export default function Slides() {
   const query = params.get('q') ?? ''
   const activeTag = params.get('tag') ?? ''
 
-  useEffect(() => {
-    document.title = 'Slides — Atsuki Shirasawa'
-  }, [])
+  usePageTitle('Slides — Atsuki Shirasawa')
 
   const tags = useMemo(() => tagIndex(), [])
   const results = useDeckSearch(query, activeTag)

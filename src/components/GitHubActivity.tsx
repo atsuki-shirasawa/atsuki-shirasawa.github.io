@@ -56,12 +56,9 @@ export default function GitHubActivity() {
     <section className="section">
       <div className="section-head">
         <h2 className="section-title">GITHUB ACTIVITY</h2>
-        {/* 大きさと間隔は .section-links が持つ。リンクは色と状態だけを書く */}
+        {/* 箱は .section-links が持つ。リンクはホバーの色だけを書く */}
         <div className="section-links">
-          <ExternalLink
-            href={profile.links.github}
-            className="tap inline-flex items-center gap-1.75 whitespace-nowrap text-muted transition-colors hover:text-fg hover:no-underline"
-          >
+          <ExternalLink href={profile.links.github} className="tap text-muted hover:text-fg">
             {/*
               WRITING と同じ形。媒体の色はアイコンだけが持ち、文字はホバーでそれに寄る。
               GitHub のマークは単色なので、その色は --fg（明で黒、暗で白）になる。

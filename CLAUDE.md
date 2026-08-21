@@ -265,7 +265,7 @@ Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で�
 | タグのチップを置く | `<DeckTags>`、または `chip` |
 | 版面で囲む | `wrap`（`container` ではない — Tailwind の組み込みとぶつかる） |
 | 節を作る | `section` / `section-head` / `section-title` |
-| 節見出しの右にリンクを置く | `section-links`（大きさと間隔は容器が持つ。リンク側は色と状態だけ書く） |
+| 節見出しの右にリンクを置く | `section-links`（箱は容器の `> a` が持つ。リンク側は `text-muted` と hover の色だけ — **色は容器に置けない**、レイヤー外なので utility の hover が負ける） |
 | 左に固定幅・右に中身の行を作る | `section-row`（CAREER / TECH STACK / WRITING 共通） |
 | 罫線の箱をホバーで浮かせる | `lift` |
 | 塗りのボタンを置く | `solid-accent`（地色と文字色が対で付く。`#fff` を書かない） |
@@ -276,5 +276,9 @@ Hero の横のトラックと CAREER の縦のレーンは 1 枚の同じ図で�
 | 読み上げにだけ渡す | `visually-hidden` |
 | ページ番号を丸める | `src/lib/page.ts` の `clampPage` / `parsePageParam` |
 | 現在年を読む | `src/lib/time.ts` の `currentYear`（`new Date()` を書かない） |
+| タブの題を決める | `usePageTitle()`（ページで `useEffect` と `document.title` を書かない） |
+| 経歴から数や位置を出す | `src/lib/career.ts` の `careerLegs()` / `careerTrack()`。Hero のトラックと CAREER のレーンは同じ読みを共有する |
+| Zenn / Qiita の色とアイコンを引く | `src/components/sites.ts` の `SITES`（`text-zenn` や `ZennIcon` を直に書かない） |
+| 記事を新しい順に並べる | `src/data/content.ts` の `posts`（すでに降順。`.tsx` で sort しない） |
 | クエリを書き換える | `useQueryUpdate()`（常に `replace`） |
 | 静的ファイルの URL を作る | `src/lib/paths.ts` の `withBase()` |
