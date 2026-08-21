@@ -4,10 +4,11 @@ import TechStack from '../components/TechStack'
 import GitHubActivity from '../components/GitHubActivity'
 import Writing from '../components/Writing'
 import Talks from '../components/Talks'
+import { siteTitle } from '../data/profile'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function Home() {
-  usePageTitle('Atsuki Shirasawa — Machine Learning Engineer')
+  usePageTitle(siteTitle)
 
   return (
     <div className="wrap">

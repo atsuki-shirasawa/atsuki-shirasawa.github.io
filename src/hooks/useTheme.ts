@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-
-const STORAGE_KEY = 'atsukish-theme'
+import { THEME_STORAGE_KEY } from '../lib/theme'
 
 type Theme = 'light' | 'dark'
 
@@ -24,13 +23,13 @@ export function useTheme() {
 
     /*
      * 保存するのは押されたあとだけ。初回描画でも保存すると、トグルを一度も
-     * 押していない訪問者に atsukish-theme が書かれ、index.html の
+     * 押していない訪問者にも鍵が書かれ、index.html の
      * 「saved が無ければ prefers-color-scheme を見る」が二度と通らなくなる。
      * OS を dark から light に変えてもサイトが付いてこないまま固定される。
      */
     if (!chosen.current) return
     try {
-      localStorage.setItem(STORAGE_KEY, theme)
+      localStorage.setItem(THEME_STORAGE_KEY, theme)
     } catch {
       // プライベートモードなどで保存できなくても表示は継続する
     }

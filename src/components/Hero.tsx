@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import CareerTrack from './CareerTrack'
 import ExternalLink from './ExternalLink'
 import { github } from '../data/content'
-import { profile } from '../data/profile'
+import { avatarAlt, profile } from '../data/profile'
 import { SITE_ORDER, SITES } from './sites'
 
 /** 3 つのボタンの共通の箱。padding は指で押せる 44px に乗せる高さ */
@@ -17,7 +17,12 @@ export default function Hero() {
     <section className="flex flex-col gap-14 pt-22 pb-14 max-wide:gap-11 max-narrow:gap-8 max-narrow:pt-14 max-narrow:pb-10">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-12 max-wide:gap-8 max-narrow:grid-cols-1 max-narrow:justify-items-start max-narrow:gap-5.5">
         <div className="flex flex-col gap-4.5">
-          <p className="font-mono text-label tracking-caps text-accent">{profile.eyebrow}</p>
+          {/*
+            総大文字は字面ではなく見せ方なので CSS に任せる。データ側に
+            'MACHINE LEARNING ENGINEER' を持つと index.html の題（Title Case）と
+            2 通りになるし、読み上げが 1 文字ずつ読む器もある
+          */}
+          <p className="font-mono text-label uppercase tracking-caps text-accent">{profile.role}</p>
           {/* ページで唯一ディスプレイ書体を張る場所。準拡張の字面で標識の見出しに寄せる */}
           <h1 className="display-title text-display-3xl font-bold max-wide:text-display-2xl max-narrow:text-display-lg">
             {profile.name}
@@ -40,7 +45,7 @@ export default function Hero() {
             <img
               className="size-[200px] rounded-full border border-line bg-chipbg object-cover transition-[border-color,translate] duration-200 group-hover:-translate-y-0.5 group-hover:border-accent max-wide:size-[150px] max-narrow:size-[104px]"
               src={github.avatarUrl}
-              alt={`${profile.name}'s GitHub avatar`}
+              alt={avatarAlt}
               width={200}
               height={200}
             />

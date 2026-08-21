@@ -1,6 +1,7 @@
 import DeckCard from '../components/DeckCard'
 import { SearchIcon } from '../components/icons/UiIcons'
 import { deckTags, decks } from '../data/decks'
+import { profile } from '../data/profile'
 import { useDeckSearch } from '../hooks/useDeckSearch'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQueryUpdate } from '../hooks/useQueryUpdate'
@@ -13,7 +14,7 @@ export default function Slides() {
   const query = params.get('q') ?? ''
   const activeTag = params.get('tag') ?? ''
 
-  usePageTitle('Slides — Atsuki Shirasawa')
+  usePageTitle(`Slides — ${profile.name}`)
 
   const results = useDeckSearch(query, activeTag)
 

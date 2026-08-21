@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Atsuki Shirasawa — Machine Learning Engineer</title>
-    <meta
-      name="description"
-      content="Portfolio of Atsuki Shirasawa — machine learning engineer. Production ML and MLOps work, tech articles and conference slide decks."
-    />
+    <!-- 題・説明・名前・テーマの鍵は src/data/profile.ts と src/lib/theme.ts が
+         持ち、vite.config.ts が __…__ に入れる。ここに写すと 2 通りになる -->
+    <title>__TITLE__</title>
+    <meta name="description" content="__DESCRIPTION__" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href="__SITE_URL__" />
 
@@ -25,19 +24,16 @@
       1 組しか持てない。デッキごとのカードを出すには、デッキごとの静的 HTML を焼いて
       ハッシュをやめる（Pages では 404.html の SPA フォールバック）必要がある。
 
-      __SITE_URL__ と __OG_IMAGE__ は vite.config.ts が入れる。
+      __ で囲んだ値はすべて vite.config.ts が入れる。
     -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="atsukish.dev" />
+    <meta property="og:site_name" content="__SITE_NAME__" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="__SITE_URL__" />
-    <meta property="og:title" content="Atsuki Shirasawa — Machine Learning Engineer" />
-    <meta
-      property="og:description"
-      content="Portfolio of Atsuki Shirasawa — machine learning engineer. Production ML and MLOps work, tech articles and conference slide decks."
-    />
+    <meta property="og:title" content="__TITLE__" />
+    <meta property="og:description" content="__DESCRIPTION__" />
     <meta property="og:image" content="__OG_IMAGE__" />
-    <meta property="og:image:alt" content="Atsuki Shirasawa's GitHub avatar" />
+    <meta property="og:image:alt" content="__IMAGE_ALT__" />
     <!-- 出すのは正方形のプロフィール画像なので summary。1200×630 のカードを
          用意したら summary_large_image に変える -->
     <meta name="twitter:card" content="summary" />
@@ -51,7 +47,7 @@
       // 初期描画前にテーマを確定させ、ライト→ダークのちらつきを防ぐ
       (function () {
         try {
-          var saved = localStorage.getItem('atsukish-theme');
+          var saved = localStorage.getItem('__THEME_KEY__');
           var dark = saved
             ? saved === 'dark'
             : window.matchMedia('(prefers-color-scheme: dark)').matches;

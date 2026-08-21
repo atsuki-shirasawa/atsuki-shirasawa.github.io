@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { avatarAlt, metaDescription, profile, siteTitle } from './src/data/profile'
+import { THEME_STORAGE_KEY } from './src/lib/theme'
 
 // GitHub Pages のユーザーサイト配信を前提に base を決める。
 // 既定は https://atsuki-shirasawa.github.io/
@@ -26,6 +28,24 @@ const ogImage = github.avatarUrl || `${siteUrl}favicon.svg`
 /** 属性値に入れるので & は実体参照にする（アバターの URL は ?v=4&s=240 を持つ） */
 const attr = (value: string) => value.replaceAll('&', '&amp;')
 
+/**
+ * index.html に写さない値。URL に加えて、題・説明・名前・テーマの鍵もここで入れる —
+ * 同じ文字列を 2 箇所に置くと、片方だけ変えたときに黙ってずれる（鍵に関しては
+ * 「保存が読まれず初回描画のテーマが外れる」という形で出る）。
+ *
+ * __THEME_KEY__ だけは属性ではなく <script> の中の文字列リテラルに入る。attr() の
+ * 実体参照はそこでは効かないので、鍵に & や引用符を入れてはいけない（src/lib/theme.ts）。
+ */
+const INJECT: Record<string, string> = {
+  __SITE_URL__: siteUrl,
+  __OG_IMAGE__: ogImage,
+  __TITLE__: siteTitle,
+  __DESCRIPTION__: metaDescription,
+  __SITE_NAME__: profile.siteName,
+  __IMAGE_ALT__: avatarAlt,
+  __THEME_KEY__: THEME_STORAGE_KEY,
+}
+
 export default defineConfig({
   base,
   plugins: [
@@ -36,7 +56,10 @@ export default defineConfig({
       transformIndexHtml: {
         order: 'pre',
         handler: (html) =>
-          html.replaceAll('__SITE_URL__', attr(siteUrl)).replaceAll('__OG_IMAGE__', attr(ogImage)),
+          Object.entries(INJECT).reduce(
+            (out, [token, value]) => out.replaceAll(token, attr(value)),
+            html,
+          ),
       },
     },
   ],
