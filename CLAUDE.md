@@ -12,7 +12,7 @@ React 19 + Vite 8 + TypeScript の静的ポートフォリオ。GitHub Pages の
 npm run dev            # decks をビルドしてから開発サーバー
 npm run decks          # decks/ を正規化（Marp → PDF → ページ画像 → 本文抽出）
 npm run fetch:content  # Zenn / Qiita / GitHub を取り直して src/data/generated.json を更新
-npm run lint           # biome lint
+npm run lint           # biome lint --error-on-warnings
 npm run typecheck      # tsc -b --noEmit
 npm test               # vitest run
 npm run decks:examples # decks/_examples の 3 形式を実際に焼いて出力を検査
@@ -34,6 +34,13 @@ npx vitest                             # 監視モード
 
 **`biome lint`（`src/` と `scripts/` の両方）。** 設定は `biome.jsonc`。
 `scripts/` は tsconfig の include の外なので、ここが唯一の網になる。
+
+- **`--error-on-warnings` が要る。** recommended preset は `noExplicitAny` と
+  `noNonNullAssertion` を **warning** で出し、`biome lint` は warning では exit 0 を
+  返す。フラグ無しでは `any` と `!` が門を素通りする（`npm run build` まで緑になる）。
+  だから `package.json` の `lint` に付けてあり、`build` / `build:only` は
+  `biome lint` を直に呼ばず **`npm run lint` を通す** — フラグを 3 箇所に散らすと
+  片方だけ変わる
 
 - **整形は入れていない**（`formatter.enabled: false`）。家の作法に合わせて掛けると
   14 ファイルが動き、marp の argv が 9 行に展開されるなど可読性が下がる方向の差が
@@ -192,7 +199,8 @@ mtime は混ぜない（git checkout が復元しないため CI で毎回ミス
 **それでも「動くか」は別。** 上の 6 件のうち 4 件はブラウザでしか出ない。だから
 **Marp か手元の PDF を足した回は、必ずブラウザで開いて見る**。
 `decks/_examples/pdf-deck` を `decks/` にコピーすれば手元で通せる（Chrome が要らない）。
-見るのは:
+手順は **`/verify-viewer`** が持っている（借りた見本の片付けまで）。コードのレビューは
+**`slide-viewer-reviewer`** サブエージェント。見るのは:
 
 | 見るもの | 期待 |
 | --- | --- |

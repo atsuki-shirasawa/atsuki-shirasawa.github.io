@@ -8,11 +8,11 @@
     "decks": "node scripts/build-decks.mjs",
     "decks:examples": "DECKS_DIR=decks/_examples node scripts/build-decks.mjs && node scripts/check-decks.mjs marp-deck pdf-deck video-deck",
     "fetch:content": "node scripts/fetch-content.mjs",
-    "build": "npm run decks && npm run fetch:content && biome lint && tsc -b && vitest run && vite build",
-    "build:only": "biome lint && tsc -b && vitest run && vite build",
+    "build": "npm run decks && npm run fetch:content && npm run lint && tsc -b && vitest run && vite build",
+    "build:only": "npm run lint && tsc -b && vitest run && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
-    "lint": "biome lint",
+    "lint": "biome lint --error-on-warnings",
     "test": "vitest run"
   },
   "dependencies": {
