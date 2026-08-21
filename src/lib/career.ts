@@ -37,7 +37,11 @@ export function careerLegs(entries: CareerEntry[] = career): CareerLeg[] {
   }))
 }
 
-export type CareerTrack = {
+/**
+ * トラックを引くのに要る寸法。コンポーネント CareerTrack と名前で衝突しないよう
+ * 型のほうに Layout を付けてある（両方を import する場所が出たときに詰む）。
+ */
+export type CareerTrackLayout = {
   /** いちばん古い開始年。トラックの左端 */
   start: number
   /** 現在年。トラックの右端 */
@@ -53,7 +57,7 @@ export type CareerTrack = {
 }
 
 /** Hero のトラック。古い順に並べ直して左から右へ引く（entries は careerLegs と同じ理由） */
-export function careerTrack(entries: CareerEntry[] = career): CareerTrack {
+export function careerTrack(entries: CareerEntry[] = career): CareerTrackLayout {
   const ordered = [...entries].sort((a, b) => a.from - b.from)
   const end = currentYear
   // career が空でも落とさない。1 点だけのトラックとして退化させる

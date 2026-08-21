@@ -24,7 +24,12 @@ export type Post = {
   url: string
 }
 
-export type DeckLink = {
+/**
+ * frontmatter の links: の 1 件。デッキ「の中の」リンクなので、デッキ「への」
+ * リンクを置くコンポーネント DeckLink とは別物 — 同じ名前だと 1 つのファイルで
+ * 両方を import できないため、型のほうを改名してある。
+ */
+export type DeckResource = {
   label: string
   url: string
 }
@@ -47,7 +52,7 @@ export type Deck = {
   speaker: string | null
   description: string
   tags: string[]
-  links: DeckLink[]
+  links: DeckResource[]
   /** 発表動画。frontmatter に video: が無ければ null */
   video: DeckVideo | null
   /** よそでホストされている資料を取り込んだときの配布元 URL */
