@@ -63,7 +63,9 @@ export function careerTrack(): CareerTrack {
     end,
     turnYear,
     turn: at(turnYear),
-    ticks: [...ordered.map((entry) => entry.from), end],
+    // 重複を落とす。同じ年に区間が 2 つある（同一社内の異動）ときと、現職の開始年が
+    // 現在年に等しいときに同じ数が並ぶ。描画側は年をそのまま key にしている
+    ticks: [...new Set([...ordered.map((entry) => entry.from), end])],
     at,
   }
 }

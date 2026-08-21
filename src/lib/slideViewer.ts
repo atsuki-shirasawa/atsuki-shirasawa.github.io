@@ -69,6 +69,8 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
   let token = 0
   let current = clampPage(options.initialPage, total)
   let lastPage: PDFPageProxy | null = null
+  /** 走っているテキスト層。container を使い回すので、次を始める前に止める */
+  let textJob: InstanceType<Pdfjs['TextLayer']> | null = null
   let disposed = false
   const cache = new Map<number, Shot>()
   const inflight = new Map<number, Draw>()
@@ -197,19 +199,35 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
     box.style.setProperty('--total-scale-factor', String(p.scale))
   }
 
+  /**
+   * pdf.js のテキスト層を張り直す。
+   *
+   * 走っている層は必ず止めてから始める。TextLayer は渡された container に span を
+   * 足していくので、止めずに 2 本走らせると 2 ページ分の文字が混ざり、さらに遅れて
+   * 終わった古い層の後片付けが、今出ているページのテキストを消してしまう
+   * （選択もコピーもできないページになる）。
+   */
   const paintText = async (page: PDFPageProxy, scale: number, mine: number) => {
     if (!pdfjs) return
+    textJob?.cancel()
     textLayer.replaceChildren()
     const layer = new pdfjs.TextLayer({
       textContentSource: page.streamTextContent(),
       container: textLayer,
       viewport: page.getViewport({ scale }),
     })
-    await layer.render()
-    if (mine !== token) {
-      textLayer.replaceChildren()
-      return
+    textJob = layer
+
+    try {
+      await layer.render()
+    } catch (error) {
+      // cancel() は render() を AbortException で reject する。自分で止めたぶんは
+      // 失敗ではないので黙る。それ以外は detach 側に声を出させる
+      if (textJob !== layer) return
+      throw error
     }
+    // 自分より後のページが始まっていたら container はもうそちらのもの。触らない
+    if (mine !== token || textJob !== layer) return
     // pdf.js はスケールから寸法を決めるが、ドリフトしないよう箱に固定する
     textLayer.style.width = '100%'
     textLayer.style.height = '100%'
@@ -350,11 +368,19 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
       })
       doc = await loadingTask.promise
       if (disposed) {
-        void loadingTask.destroy()
+        // destroy() は失敗すると throw する。void は catch を付けないので、
+        // ここで受けないと unhandled rejection になる
+        loadingTask.destroy().catch(() => {})
         return
       }
       await show(current)
     } catch (error) {
+      /*
+       * 離れたあとに来た失敗は、こちらが読み込みタスクを捨てたせい — pdf.js は
+       * 保留中の promise を Error("Loading aborted") で reject する。もう誰も
+       * 見ていない画面に failed を出さず、コンソールにも残さない。
+       */
+      if (disposed) return
       console.error('[viewer] pdf.js could not open the deck', error)
       doc = null
       options.onState('failed')
@@ -392,9 +418,12 @@ export function createSlideViewer(options: SlideViewerOptions): SlideViewerHandl
       for (const entry of inflight.values()) entry.cancel()
       forget()
       lastPage = null
+      textJob?.cancel()
+      textJob = null
       // PDFDocumentProxy に destroy は無い（pdf.js 6 で消えた）。読み込みタスクを
-      // 捨てないと、デッキを離れてもワーカーとドキュメントが残る
-      void loadingTask?.destroy()
+      // 捨てないと、デッキを離れてもワーカーとドキュメントが残る。
+      // destroy() は失敗すると throw するので、catch を付けて void にはしない
+      loadingTask?.destroy().catch(() => {})
       loadingTask = null
       doc = null
     },
